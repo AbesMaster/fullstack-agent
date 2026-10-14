@@ -23,6 +23,7 @@ export async function createDb(opts: { url?: string; pgliteDir?: string; inMemor
   const { vector } = await import("@electric-sql/pglite/vector");
   const { drizzle } = await import("drizzle-orm/pglite");
   const dataDir = opts.inMemory ? undefined : (opts.pgliteDir ?? env().PGLITE_DIR);
+  if (dataDir) (await import("node:fs")).mkdirSync(path.dirname(path.resolve(dataDir)), { recursive: true });
   const client = await PGlite.create({ dataDir, extensions: { vector } });
   return drizzle(client, { schema }) as unknown as DB;
 }

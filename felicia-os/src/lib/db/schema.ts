@@ -409,3 +409,21 @@ export const contentItems = pgTable("content_items", {
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
+
+/* ------------------------------------------------------------------ */
+/* Optional client feedback (published only with explicit consent)    */
+/* ------------------------------------------------------------------ */
+
+export const feedback = pgTable(
+  "feedback",
+  {
+    id: id(),
+    bookingId: text("booking_id").notNull().references(() => bookings.id),
+    rating: integer("rating"),
+    comment: text("comment"),
+    consentToPublish: boolean("consent_to_publish").notNull().default(false),
+    publishName: text("publish_name"), // how the client wants to be credited, if at all
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("feedback_booking_uq").on(t.bookingId)],
+);

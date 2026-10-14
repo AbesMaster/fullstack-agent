@@ -7,15 +7,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx scripts/migrate.ts",
-    "db:seed:demo": "tsx scripts/seed-demo.ts",
-    "worker": "tsx scripts/worker.ts"
+    "db:migrate": "tsx scripts/migrate.mts",
+    "db:seed:demo": "tsx scripts/seed-demo.mts",
+    "worker": "tsx scripts/worker.mts"
   },
   "engines": {
     "node": ">=20"
@@ -31,6 +30,7 @@
     "pg": "^8.23.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "server-only": "^0.0.1",
     "stripe": "^18.5.0",
     "unpdf": "^1.8.1",
     "zod": "^3.25.76"
