@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import type { DB } from "../db/client";
 import { bookings, eventRegistrations, payments, refundRequests } from "../db/schema";
+import { getEvent } from "../programme/events";
 import { publish } from "../events/bus";
 import { audit } from "../audit/audit";
 import { newId } from "../util";
@@ -19,6 +20,14 @@ export async function applyPaymentEvent(db: DB, provider: "stripe" | "mock", evt
     const isBooking = evt.reference.startsWith("bkg_");
     const isRegistration = evt.reference.startsWith("reg_");
     if (!isBooking && !isRegistration) throw new Error(`Unknown payment reference ${evt.reference}`);
+
+    if (isRegistration) {
+      const [r] = await db.select().from(eventRegistrations).where(eq(eventRegistrations.id, evt.reference));
+      if (!r) throw new Error(`Registration ${evt.reference} not found`);
+      if (evt.amountMinor !== r.amountMinor) {
+        await audit(db, { actor: `webhook:${provider}`, action: "payment.amount_mismatch", target: r.id, correlationId, metadata: { expected: r.amountMinor, got: evt.amountMinor, event: (await getEvent(db, r.eventId))?.title } });
+      }
+    }
 
     if (isBooking) {
       const [b] = await db.select().from(bookings).where(eq(bookings.id, evt.reference));
@@ -87,9 +96,6 @@ export async function confirmPaidBooking(db: DB, bookingId: string, correlationI
   return !!b;
 }
 
-export async function confirmPaidRegistration(db: DB, registrationId: string) {
-  await db.update(eventRegistrations).set({ status: "confirmed" }).where(eq(eventRegistrations.id, registrationId));
-}
 
 /**
  * Refund requests are always reviewed: this records the request and an approval.

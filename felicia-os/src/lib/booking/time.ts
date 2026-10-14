@@ -66,3 +66,18 @@ export function isValidTimeZone(tz: string) {
 }
 
 export const overlaps = (aStart: Date, aEnd: Date, bStart: Date, bEnd: Date) => aStart < bEnd && bStart < aEnd;
+
+/** "YYYY-MM-DDTHH:mm" wall-clock value for a datetime-local input, in the given zone. */
+export function toZonedInputValue(date: Date, timeZone = "Europe/London") {
+  const p = wallClock(date, timeZone);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${p.year}-${pad(p.month)}-${pad(p.day)}T${pad(p.hour)}:${pad(p.minute)}`;
+}
+
+/** Parses a datetime-local value as wall-clock time in the given zone (not the browser's). */
+export function fromZonedInputValue(value: string, timeZone = "Europe/London") {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+  if (!m) throw new Error("Invalid date and time");
+  const [, y, mo, d, h, mi] = m.map(Number) as number[];
+  return zonedTimeToUtc(y!, mo!, d!, h!, mi!, timeZone);
+}

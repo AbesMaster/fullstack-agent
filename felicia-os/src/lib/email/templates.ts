@@ -86,7 +86,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     kind: "transactional",
     requiredVars: ["name", "event", "when", "location"],
     subject: (v) => `You're registered: ${v.event}`,
-    body: (v) => `Dear ${v.name},\n\nYou're registered for ${v.event} on ${v.when} at ${v.location}.${WELLBEING_NOTE}${SIGN_OFF}`,
+    body: (v) => `Dear ${v.name},\n\nYou're registered for ${v.event} on ${v.when} at ${v.location}.${v.healthNote ? `\n\n${v.healthNote}` : ""}${WELLBEING_NOTE}${SIGN_OFF}`,
   },
   event_reminder: {
     kind: "transactional",

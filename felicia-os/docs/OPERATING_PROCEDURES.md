@@ -4,6 +4,7 @@
 | When | Agent | What |
 |---|---|---|
 | Every 5 min | Scheduling | Release unpaid holds older than 30 min; send 24-hour reminders (once each) |
+| Every 5 min | Events | Release unpaid event places older than 30 min; send day-before reminders to confirmed attendees (once each) |
 | Every 5 min | Client Experience | Mark ended sessions completed; thank-you / post-discovery follow-up; optional feedback request 24 h later |
 | 07:00 | Executive Ops | Daily brief: today's sessions, open enquiries, approvals, attention items, unpaid bookings |
 | 08:00 | Financial Intelligence | Budget alerts (marketing, expense threshold, refund rate, startup ceiling, event overruns) |

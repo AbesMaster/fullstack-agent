@@ -121,3 +121,13 @@ describe("booking flow", () => {
     expect(h.email.outbox.some((m) => m.subject === "Your booking has been cancelled")).toBe(true);
   });
 });
+
+describe("admin date inputs", () => {
+  it("round-trips UK wall-clock values regardless of server time zone", async () => {
+    const { fromZonedInputValue, toZonedInputValue } = await import("@/lib/booking/time");
+    expect(fromZonedInputValue("2026-07-04T10:00").toISOString()).toBe("2026-07-04T09:00:00.000Z");
+    expect(fromZonedInputValue("2026-01-04T10:00").toISOString()).toBe("2026-01-04T10:00:00.000Z");
+    expect(toZonedInputValue(new Date("2026-07-04T09:00:00Z"))).toBe("2026-07-04T10:00");
+    expect(() => fromZonedInputValue("tomorrow")).toThrow();
+  });
+});

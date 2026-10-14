@@ -7,7 +7,8 @@ import { crmProvider } from "../crm/provider";
 import { calendarProvider } from "../calendar/provider";
 import { paymentProvider } from "../payments/provider";
 import { sendMarketingContent, sendTemplate } from "../email/send";
-import { confirmPaidBooking, confirmPaidRegistration } from "../payments/processing";
+import { confirmPaidBooking } from "../payments/processing";
+import { confirmRegistrationAfterPayment } from "../programme/events";
 import { escalationReason } from "../compliance/claims";
 import { formatInZone } from "../booking/time";
 import { signResourceToken } from "../security/tokens";
@@ -43,6 +44,18 @@ async function bookingContext(db: DB, bookingId: string) {
   const [s] = await db.select().from(services).where(eq(services.id, b.serviceId));
   const c = await contactFor(db, b.contactId);
   return { b, s: s!, c, when: formatInZone(b.startsAt, b.clientTimezone) };
+}
+
+export function registrationEmailVars(name: string, ev: typeof programmeEvents.$inferSelect) {
+  return {
+    name,
+    event: ev.title,
+    when: formatInZone(ev.startsAt, "Europe/London"),
+    location: ev.location,
+    healthNote: ev.includesBreathwork
+      ? "This event includes breathwork. If you are pregnant, or have a heart, respiratory, seizure-related or serious mental health condition, please reply to this email before the day so Felicia can advise you or adapt the practice."
+      : "",
+  };
 }
 
 export function buildBus(): EventBus {
@@ -202,8 +215,7 @@ export function buildBus(): EventBus {
       recordTask(db, "payments", "confirm_after_payment", e.correlationId, e.payload, async () => {
         if (e.payload.bookingId) return { confirmed: await confirmPaidBooking(db, e.payload.bookingId, e.correlationId) };
         if (e.payload.registrationId) {
-          await confirmPaidRegistration(db, e.payload.registrationId);
-          return { registration: true };
+          return confirmRegistrationAfterPayment(db, e.payload.registrationId, e.correlationId);
         }
         return {};
       }),
@@ -225,7 +237,7 @@ export function buildBus(): EventBus {
           const [r] = await db.select().from(eventRegistrations).where(eq(eventRegistrations.id, p.registrationId));
           const [ev] = r ? await db.select().from(programmeEvents).where(eq(programmeEvents.id, r.eventId)) : [];
           const c = r ? await contactFor(db, r.contactId) : undefined;
-          if (c && ev) return sendTemplate(db, "workshop_registration", c.email, { name: c.name, event: ev.title, when: formatInZone(ev.startsAt, "Europe/London"), location: ev.location }, e.correlationId);
+          if (c && ev) return sendTemplate(db, "workshop_registration", c.email, registrationEmailVars(c.name, ev), e.correlationId);
         }
         return "skipped";
       }),
@@ -239,6 +251,38 @@ export function buildBus(): EventBus {
       // Abandoned/failed checkout: record for the sales report; no automatic chasing.
       await db.insert(agentTasks).values({ id: newId("tsk"), agentId: "sales-ops", kind: "abandoned_booking", status: "queued", correlationId: e.correlationId, input: e.payload });
     },
+  });
+
+  /* ---------------- Event registrations ---------------- */
+
+  bus.register({
+    name: "crm.sync_registrant",
+    agentId: "crm",
+    on: "EVENT_REGISTRATION_CREATED",
+    run: (db, e) =>
+      recordTask(db, "crm", "sync_registrant", e.correlationId, e.payload, async () => {
+        const [r] = await db.select().from(eventRegistrations).where(eq(eventRegistrations.id, e.payload.registrationId));
+        if (!r) throw new Error("Registration missing");
+        const c = await contactFor(db, r.contactId);
+        const res = await crmProvider().upsertContact({ email: c.email, name: c.name, phone: c.phone, lifecycleStage: c.lifecycleStage, source: c.source, marketingConsent: c.marketingConsent });
+        await db.update(contacts).set({ crmExternalId: res.externalId }).where(eq(contacts.id, c.id));
+        return { externalId: res.externalId };
+      }),
+  });
+
+  bus.register({
+    name: "events.free_registration_confirmation",
+    agentId: "events",
+    on: "EVENT_REGISTRATION_CREATED",
+    run: (db, e) =>
+      recordTask(db, "events", "registration_confirmation", e.correlationId, e.payload, async () => {
+        // Paid places are confirmed by the payment receipt instead; this covers free events.
+        const [r] = await db.select().from(eventRegistrations).where(eq(eventRegistrations.id, e.payload.registrationId));
+        if (!r || r.status !== "confirmed" || r.amountMinor > 0) return "skipped";
+        const [ev] = await db.select().from(programmeEvents).where(eq(programmeEvents.id, r.eventId));
+        const c = await contactFor(db, r.contactId);
+        return sendTemplate(db, "workshop_registration", c.email, registrationEmailVars(c.name, ev!), e.correlationId);
+      }),
   });
 
   /* ---------------- Intake ---------------- */

@@ -1,6 +1,7 @@
 import { and, between, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
-import { agentTasks, bookings, contacts, emailLog, enquiries, services } from "../db/schema";
+import { agentTasks, bookings, contacts, emailLog, enquiries, eventRegistrations, programmeEvents, services } from "../db/schema";
+import { expireRegistrationHolds } from "../programme/events";
 import { recordTask, isEmergencyStopped, listPendingApprovals } from "./controls";
 import { ownerAttentionItems } from "./workflows";
 import { sendTemplate } from "../email/send";
@@ -99,6 +100,26 @@ export async function expireUnpaidHolds(db: DB, now = new Date()) {
   return { expired: stale.length };
 }
 
+/** 24-hour reminders for confirmed event registrants, once each. */
+export async function sendEventReminders(db: DB, now = new Date()) {
+  const from = new Date(now.getTime() + 23 * 3600_000);
+  const to = new Date(now.getTime() + 25 * 3600_000);
+  const due = await db
+    .select({ r: eventRegistrations, ev: programmeEvents, c: contacts })
+    .from(eventRegistrations)
+    .innerJoin(programmeEvents, eq(eventRegistrations.eventId, programmeEvents.id))
+    .innerJoin(contacts, eq(eventRegistrations.contactId, contacts.id))
+    .where(and(eq(eventRegistrations.status, "confirmed"), between(programmeEvents.startsAt, from, to), inArray(programmeEvents.status, ["open", "full", "closed"])));
+  let sent = 0;
+  for (const { r, ev, c } of due) {
+    const [prior] = await db.select().from(emailLog).where(eq(emailLog.correlationId, `event-reminder:${r.id}`));
+    if (prior) continue;
+    await sendTemplate(db, "event_reminder", c.email, { name: c.name, event: ev.title, when: formatInZone(ev.startsAt, "Europe/London"), logistics: `Location: ${ev.location}.` }, `event-reminder:${r.id}`);
+    sent++;
+  }
+  return { sent };
+}
+
 /* ---------------- Finance ---------------- */
 
 export async function financialOps(db: DB, now = new Date()) {
@@ -138,6 +159,8 @@ export async function runDueJobs(db: DB, now = new Date()) {
 
   results.holds = await recordTask(db, "scheduling", "expire_unpaid_holds", undefined, {}, () => expireUnpaidHolds(db, now));
   results.reminders = await recordTask(db, "scheduling", "send_reminders", undefined, {}, () => sendReminders(db, now));
+  results.eventHolds = await recordTask(db, "events", "expire_registration_holds", undefined, {}, () => expireRegistrationHolds(db, now));
+  results.eventReminders = await recordTask(db, "events", "send_event_reminders", undefined, {}, () => sendEventReminders(db, now));
   results.aftercare = await recordTask(db, "client-experience", "aftercare", undefined, {}, () => aftercare(db, now));
 
   const daily = async (kind: string, agent: string, hour: number, fn: () => Promise<unknown>) => {

@@ -21,6 +21,9 @@ Every price starts as **proposed** ("pricing being finalised" shows on the site)
 ## Enquiries & bookings
 See every enquiry, what the person is interested in, and whether they agreed to marketing emails. In the bookings table, "review needed" means the welcome form flagged something for you. Only you (the owner) can open those answers, and each time you do it's recorded.
 
+## Events & workshops
+Create an event under **Events**. Start it as **Planning** while you prepare (visitors can't see it), then set it to **Open** to publish its page and take registrations. Free events confirm straight away; paid places are held for 30 minutes while the person pays, and are confirmed when the payment arrives. The event switches to **Full** on its own when places run out, and back to **Open** if someone cancels. Tick **Includes breathwork** to add a health notice and a required acknowledgment. Each event has a readiness checklist and a list of who's coming. Cancelling a paid place doesn't refund it automatically: request the refund separately so it goes through approvals. Dates are always entered in UK time.
+
 ## Finance
 Record expenses, see the last six months of actual figures, compare three forecast scenarios, and edit the assumptions behind them. "Export actuals (CSV)" downloads a spreadsheet for your accountant.
 

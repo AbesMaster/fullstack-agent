@@ -15,6 +15,13 @@
       "when": 1791996751782,
       "tag": "0001_feedback",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791998872520,
+      "tag": "0002_event_registration",
+      "breakpoints": true
     }
   ]
 }

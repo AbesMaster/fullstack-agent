@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { SESSION_COOKIE, can, readSessionToken, mfaRequired, requirePermission, Forbidden, type Permission } from "./auth/auth";
 import { env } from "./config/env";
 import { BookingError } from "./booking/booking";
+import { EventError } from "./programme/events";
 import { PermissionDenied } from "./agents/controls";
 
 let seeded: Promise<void> | undefined;
@@ -75,6 +76,7 @@ export function handle(fn: () => Promise<Response>) {
   return fn().catch((err: unknown) => {
     if (err instanceof ZodError) return NextResponse.json({ error: "Please check the highlighted fields.", issues: err.issues.map((i) => ({ path: i.path.join("."), message: i.message })) }, { status: 400 });
     if (err instanceof BookingError) return NextResponse.json({ error: err.message, code: err.code }, { status: err.code === "conflict" ? 409 : 400 });
+    if (err instanceof EventError) return NextResponse.json({ error: err.message, code: err.code }, { status: err.code === "full" || err.code === "already_registered" ? 409 : 400 });
     if (err instanceof RateLimited) return NextResponse.json({ error: "Too many requests. Please wait a minute and try again." }, { status: 429 });
     if (err instanceof Forbidden || err instanceof PermissionDenied) return NextResponse.json({ error: "Not permitted." }, { status: 403 });
     console.error("[felicia-os] unhandled error", err instanceof Error ? err.message : err);

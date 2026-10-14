@@ -213,6 +213,8 @@ export const intakeRecords = pgTable("intake_records", {
 export const programmeEvents = pgTable("programme_events", {
   id: id(),
   title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  includesBreathwork: boolean("includes_breathwork").notNull().default(false),
   serviceId: text("service_id").references(() => services.id),
   startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
   endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
@@ -232,6 +234,10 @@ export const eventRegistrations = pgTable(
     eventId: text("event_id").notNull().references(() => programmeEvents.id),
     contactId: text("contact_id").notNull().references(() => contacts.id),
     status: text("status").notNull().default("pending_payment"), // pending_payment|confirmed|cancelled|attended
+    amountMinor: integer("amount_minor").notNull().default(0),
+    /** When the current unpaid hold began (reset if a cancelled registrant registers again). */
+    holdStartedAt: timestamp("hold_started_at", { withTimezone: true }).notNull().defaultNow(),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex("event_reg_uq").on(t.eventId, t.contactId)],

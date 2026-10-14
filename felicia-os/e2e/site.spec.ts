@@ -60,6 +60,60 @@ test("contact form + AI assistant identifies itself", async ({ page }) => {
   await expect(page.getByText(/AI assistant \(not Felicia\)/)).toBeVisible();
 });
 
+async function signIn(page: import("@playwright/test").Page) {
+  const url = readFileSync("e2e-artifacts/admin.txt", "utf8").match(/otpauth:\/\/\S+/)![0];
+  const secret = new URL(url).searchParams.get("secret")!;
+  await page.goto("/login");
+  await expect(page.getByRole("button", { name: "Sign in" })).toBeEnabled();
+  await page.getByLabel("Email").fill("e2e-owner@example.test");
+  await page.getByLabel("Password").fill("e2e-owner-password-long");
+  // A fresh code each attempt; wait out the window if this code was just used by another test.
+  await page.getByLabel(/Authenticator code/).fill(authenticator.generate(secret));
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+}
+
+test("Felicia creates an event, a visitor registers and pays, and appears on the list", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/admin/events");
+  const title = `Breath & Stillness Morning (e2e ${Date.now()})`;
+  await page.locator("#new-title").fill(title);
+  await page.locator("#new-description").fill("A gentle morning of guided breath and reflection. (Test event.)");
+  await page.locator("#new-location").fill("Bath, UK (test venue)");
+  const d = new Date(Date.now() + 14 * 86400_000).toISOString().slice(0, 10);
+  await page.locator("#new-starts").fill(`${d}T10:00`);
+  await page.locator("#new-ends").fill(`${d}T13:00`);
+  await page.locator("#new-capacity").fill("8");
+  await page.locator("#new-price").fill("111");
+  await page.locator("#new-status").selectOption("open");
+  await page.locator("#new-breathwork").check();
+  await page.getByRole("button", { name: "Create event" }).click();
+  await expect(page.getByRole("heading", { name: title })).toBeVisible();
+  const eventPath = new URL(page.url()).pathname.replace("/admin", "");
+
+  const visitor = await page.context().browser()!.newPage();
+  await visitor.goto("/events");
+  await visitor.getByRole("link", { name: "Details & booking" }).first().click();
+  await expect(visitor.getByRole("heading", { level: 1 })).toHaveText(title);
+  await expect(visitor.getByText("This event includes breathwork")).toBeVisible();
+  await visitor.screenshot({ path: "e2e-artifacts/event-page.png", fullPage: true });
+  await expect(visitor.getByRole("button", { name: /Continue to secure payment/ })).toBeEnabled();
+  await visitor.locator("#reg-name").fill("E2E Attendee (test)");
+  await visitor.locator("#reg-email").fill("e2e-attendee@example.test");
+  await visitor.locator("#reg-health").check();
+  await visitor.locator("#reg-terms").check();
+  await visitor.getByRole("button", { name: /Continue to secure payment/ }).click();
+  await expect(visitor.getByText("Not a real payment")).toBeVisible();
+  await visitor.getByRole("button", { name: "Simulate successful test payment" }).click();
+  await expect(visitor).toHaveURL(/thank-you/);
+  await visitor.close();
+
+  await page.goto(`/admin${eventPath}`);
+  await expect(page.getByRole("cell", { name: "E2E Attendee (test)" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "confirmed" })).toBeVisible();
+  await page.screenshot({ path: "e2e-artifacts/admin-event.png", fullPage: true });
+});
+
 test("admin requires sign-in with MFA and shows the Command Center", async ({ page }) => {
   await page.goto("/admin");
   await expect(page).toHaveURL(/login/);

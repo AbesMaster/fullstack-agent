@@ -32,6 +32,7 @@ Deliberately **one deployable app plus one worker process** with no n8n, queue b
 | `events/` | Typed event schemas and outbox bus: exactly-once handler receipts, backoff, DLQ, emergency-stop aware |
 | `agents/` | Registry (21 agents), permission and approval controls, event workflows, scheduled operations, website conversation agent |
 | `ai/` | Claude drafting client: structured outputs, model tier by task, untrusted text fenced as data |
+| `programme/` | Workshops, groups and retreats: event creation, self-service registration, capacity and unpaid holds, payment confirmation |
 | `finance/` | Monthly actuals, scenario forecasts, budget alerts, event profitability |
 | `knowledge/` | Ingestion (PDF/DOCX/TXT/MD/CSV/JSON/URL), chunking, versioning, pgvector retrieval with access levels |
 | `compliance/` | Claim checker (blocks cure/guarantee claims), escalation detector, crisis response |
