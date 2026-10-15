@@ -41,6 +41,15 @@ export class StripeProvider implements PaymentProvider {
     this.stripe = new Stripe(secretKey);
   }
 
+  /** Read-only launch check: key works, test or live mode, and a webhook points at this site. */
+  async verifyConnection(appUrl: string) {
+    await this.stripe.balance.retrieve();
+    const hooks = await this.stripe.webhookEndpoints.list({ limit: 100 });
+    const target = `${appUrl.replace(/\/$/, "")}/api/webhooks/payments`;
+    const hook = hooks.data.find((h) => h.url === target && h.status === "enabled");
+    return { mode: this.secretKey.startsWith("sk_live_") || this.secretKey.startsWith("rk_live_") ? ("live" as const) : ("test" as const), webhook: hook ? "enabled" : "missing", target };
+  }
+
   async createCheckout(req: CheckoutRequest): Promise<CheckoutSession> {
     const s = await this.stripe.checkout.sessions.create(
       {

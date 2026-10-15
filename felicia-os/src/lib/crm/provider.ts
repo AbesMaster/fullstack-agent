@@ -32,6 +32,12 @@ export class HubSpotProvider implements CrmProvider {
   readonly name = "hubspot" as const;
   constructor(private token: string, private fetchImpl: typeof fetch = fetch) {}
 
+  /** Read-only launch check: the private app token can read contacts. */
+  async verifyConnection() {
+    await this.call("/crm/v3/objects/contacts?limit=1", { method: "GET" });
+    return { ok: true as const };
+  }
+
   private async call(path: string, init: RequestInit) {
     const res = await this.fetchImpl(`https://api.hubapi.com${path}`, {
       ...init,

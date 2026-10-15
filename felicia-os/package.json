@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.mts",
     "db:seed:demo": "tsx scripts/seed-demo.mts",
-    "worker": "tsx scripts/worker.mts"
+    "worker": "tsx scripts/worker.mts",
+    "preflight": "tsx scripts/preflight.mts"
   },
   "engines": {
     "node": ">=20"

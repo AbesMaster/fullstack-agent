@@ -13,6 +13,8 @@
 - Email: Resend with SPF/DKIM/DMARC on metamastermindz.com.
 
 ## Steps (staging first)
+The quickest route is the Render blueprint (`render.yaml` at the repository root); `docs/GO_LIVE.md` walks through it. Before any deploy, run `npm run preflight -- --verify`.
+
 1. Create the database and set `DATABASE_URL`. Run `npm run db:migrate`.
 2. Set every variable in `.env.example` (generate secrets with `openssl rand -base64 48` / `-base64 32`). Store them in the host's secret manager, never in Git.
 3. `ADMIN_PASSWORD=… npx tsx scripts/create-admin.mts felicia@… "Felicia Stefan" owner`. Scan the printed otpauth URL into an authenticator.

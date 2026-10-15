@@ -34,6 +34,22 @@ function anthropic() {
 
 export const llmAvailable = () => !!env().ANTHROPIC_API_KEY;
 
+/** Read-only launch check: the API key works and the configured models exist. */
+export async function verifyClaude() {
+  const c = anthropic();
+  if (!c) throw new LlmUnavailable();
+  const e = env();
+  const missing: string[] = [];
+  for (const m of [e.ANTHROPIC_MODEL_FAST, e.ANTHROPIC_MODEL_STANDARD]) {
+    try {
+      await c.models.retrieve(m);
+    } catch {
+      missing.push(m);
+    }
+  }
+  return { missing };
+}
+
 export class LlmUnavailable extends Error {
   constructor() {
     super("ANTHROPIC_API_KEY is not configured — drafting falls back to templates");

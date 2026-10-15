@@ -11,7 +11,7 @@ export type MeetingRequest = { topic: string; start: Date; durationMinutes: numb
 export type Meeting = { meetingId: string; joinUrl: string; passcode: string | null };
 
 export interface VideoProvider {
-  readonly name: "zoom" | "mock";
+  readonly name: "zoom" | "mock" | "unconnected";
   createMeeting(m: MeetingRequest): Promise<Meeting>;
   updateMeeting(meetingId: string, m: { start: Date; durationMinutes: number; timezone: string; topic?: string }): Promise<void>;
   deleteMeeting(meetingId: string): Promise<void>;
@@ -32,6 +32,12 @@ export class ZoomProvider implements VideoProvider {
     private cfg: { accountId: string; clientId: string; clientSecret: string; hostUser: string },
     private fetchImpl: typeof fetch = fetch,
   ) {}
+
+  /** Read-only launch check: can we sign in, and is the host on a paid (licensed) plan? */
+  async verifyConnection() {
+    const u = (await this.api(`/users/${encodeURIComponent(this.cfg.hostUser)}`, { method: "GET" })) as { email?: string; type?: number };
+    return { host: u.email ?? this.cfg.hostUser, licensed: u.type === 2 };
+  }
 
   private async accessToken() {
     if (this.token && this.token.exp > Date.now() + 60_000) return this.token.value;
@@ -124,6 +130,23 @@ export class MockVideoProvider implements VideoProvider {
   }
 }
 
+/** Production without Zoom credentials: every call fails clearly so the owner is alerted. */
+export class UnconnectedVideoProvider implements VideoProvider {
+  readonly name = "unconnected" as const;
+  private fail(): never {
+    throw new VideoError("Zoom isn't connected yet, so no meeting link was created. Add the Zoom app details, then retry.", false);
+  }
+  async createMeeting(): Promise<Meeting> {
+    this.fail();
+  }
+  async updateMeeting() {
+    this.fail();
+  }
+  async deleteMeeting() {
+    this.fail();
+  }
+}
+
 let override: VideoProvider | undefined;
 let devSingleton: MockVideoProvider | undefined;
 export function setVideoProviderForTests(p: VideoProvider | undefined) {
@@ -135,6 +158,8 @@ export function videoProvider(): VideoProvider {
   if (e.ZOOM_ACCOUNT_ID && e.ZOOM_CLIENT_ID && e.ZOOM_CLIENT_SECRET) {
     return new ZoomProvider({ accountId: e.ZOOM_ACCOUNT_ID, clientId: e.ZOOM_CLIENT_ID, clientSecret: e.ZOOM_CLIENT_SECRET, hostUser: e.ZOOM_HOST_USER });
   }
+  // Never send real clients a made-up link: in production, a missing Zoom app is a visible failure.
+  if (e.APP_ENV === "production") return new UnconnectedVideoProvider();
   return (devSingleton ??= new MockVideoProvider());
 }
 

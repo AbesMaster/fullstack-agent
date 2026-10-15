@@ -15,6 +15,19 @@ export interface EmailTransport {
 export class ResendTransport implements EmailTransport {
   readonly name = "resend" as const;
   constructor(private apiKey: string, private from: string, private fetchImpl: typeof fetch = fetch) {}
+
+  /**
+   * Read-only launch check: is the sending domain verified (SPF/DKIM)? A key restricted to
+   * "sending access" can't list domains; that is reported as "unknown", not a failure.
+   */
+  async verifyDomain(): Promise<{ domain: string; status: string }> {
+    const domain = (this.from.match(/@([^>\s]+)/)?.[1] ?? "").toLowerCase();
+    const res = await this.fetchImpl("https://api.resend.com/domains", { headers: { authorization: `Bearer ${this.apiKey}` } });
+    if (res.status === 401 || res.status === 403) return { domain, status: "unknown" };
+    if (!res.ok) throw new Error(`Resend domains check failed: ${res.status}`);
+    const j = (await res.json()) as { data?: { name: string; status: string }[] };
+    return { domain, status: j.data?.find((d) => d.name.toLowerCase() === domain)?.status ?? "not_added" };
+  }
   async send(m: { to: string; subject: string; text: string; headers?: Record<string, string> }) {
     const res = await this.fetchImpl("https://api.resend.com/emails", {
       method: "POST",
@@ -45,6 +58,8 @@ export function emailTransport(): EmailTransport {
   if (override) return override;
   const e = env();
   if (e.EMAIL_PROVIDER_API_KEY) return new ResendTransport(e.EMAIL_PROVIDER_API_KEY, e.EMAIL_FROM);
+  // Clients must never be told "a confirmation is on its way" when nothing is sent.
+  if (e.APP_ENV === "production") throw new Error("An email provider (EMAIL_PROVIDER_API_KEY) is required in production");
   return (devSingleton ??= new MockTransport());
 }
 

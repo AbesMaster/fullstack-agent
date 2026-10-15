@@ -1,0 +1,92 @@
+# One-click hosting for FELICIA OS on Render (https://render.com/docs/blueprint-spec).
+# Render → New → Blueprint → pick this repository. It creates the website, the background
+# worker and a PostgreSQL database in the EU, then asks for each secret marked "sync: false".
+#
+# It starts as STAGING (Stripe test keys, search engines blocked). Switch APP_ENV to
+# "production" and swap in live Stripe keys only after the launch check passes and
+# Felicia signs off. See felicia-os/docs/GO_LIVE.md.
+#
+# Approximate cost: web Starter + worker Starter + Postgres Basic ≈ $20 a month.
+
+envVarGroups:
+  - name: felicia-os-shared
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: APP_URL
+        sync: false # e.g. https://metamastermindz.com once the domain is connected
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATA_ENCRYPTION_KEY
+        generateValue: true # 32 random bytes. Copy it somewhere safe: intake forms can't be read without it.
+      - key: CRON_SECRET
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: EMAIL_PROVIDER_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: "Felicia at MetaMasterMindz <hello@metamastermindz.com>"
+      - key: ZOOM_ACCOUNT_ID
+        sync: false
+      - key: ZOOM_CLIENT_ID
+        sync: false
+      - key: ZOOM_CLIENT_SECRET
+        sync: false
+      - key: ZOOM_HOST_USER
+        value: me
+      - key: GOOGLE_CALENDAR_ID
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: HUBSPOT_ACCESS_TOKEN
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+
+services:
+  - type: web
+    name: felicia-os
+    runtime: node
+    region: frankfurt
+    plan: starter
+    rootDir: felicia-os
+    buildCommand: npm ci --include=dev && npm run build
+    preDeployCommand: npm run db:migrate
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: false # deploys happen when someone presses Deploy, never by surprise
+    envVars:
+      - fromGroup: felicia-os-shared
+      - key: DATABASE_URL
+        fromDatabase:
+          name: felicia-os-db
+          property: connectionString
+
+  - type: worker
+    name: felicia-os-worker
+    runtime: node
+    region: frankfurt
+    plan: starter
+    rootDir: felicia-os
+    buildCommand: npm ci --include=dev
+    startCommand: npm run worker
+    autoDeploy: false
+    envVars:
+      - fromGroup: felicia-os-shared
+      - key: DATABASE_URL
+        fromDatabase:
+          name: felicia-os-db
+          property: connectionString
+
+databases:
+  - name: felicia-os-db
+    region: frankfurt
+    plan: basic-256mb
+    postgresMajorVersion: "16"
+    databaseName: felicia_os
+    ipAllowList: [] # only Render services can connect

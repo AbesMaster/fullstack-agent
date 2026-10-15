@@ -41,6 +41,7 @@ npm run test:e2e                      # 8 browser end-to-end tests (needs a Chro
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design, data model, agents, events, security |
 | [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) | Plain-English guide for Felicia: running the business without touching code |
 | [docs/OPERATING_PROCEDURES.md](docs/OPERATING_PROCEDURES.md) | Daily, weekly and monthly routines, escalations, incidents |
+| [docs/GO_LIVE.md](docs/GO_LIVE.md) | **Going live, step by step**: accounts, one-click hosting, launch check, rehearsal, launch |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Environments, CI/CD, migrations, backups, rollback |
 | [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md) | The launch checklist |
 | [docs/COMPLIANCE_CHECKLIST.md](docs/COMPLIANCE_CHECKLIST.md) | UK GDPR, PECR, ASA/CAP, consumer law, Qatar: items for professional review |

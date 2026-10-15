@@ -27,12 +27,12 @@ _Last updated: 2026-10-14, at the end of the first build session._
 | 17 | Privacy and security controls | TESTED | RBAC, MFA, scrypt, signed sessions, CSRF origin check, rate limits, security headers, encryption, CRM data guard |
 | 18 | Audit logging | TESTED | Append-only, no sensitive payloads |
 | 19 | Automated tests | TESTED | 86 unit/integration + 8 E2E, all passing |
-| 20 | Deployment configuration | IMPLEMENTED | GitHub Actions CI, env template, migration/worker scripts, Dockerfile. **No staging host** |
+| 20 | Deployment configuration | TESTED | GitHub Actions CI, env template, migration/worker scripts, Dockerfile, one-click Render blueprint (`render.yaml`: website, worker, EU Postgres; starts as staging). Production refuses to fake Zoom links or emails when those services are missing. **No host yet: waiting on Felicia's accounts** (see `docs/GO_LIVE.md`) |
 | 21 | Administrator documentation | IMPLEMENTED | `docs/ADMIN_GUIDE.md` |
 | 22 | Operating procedures | IMPLEMENTED | `docs/OPERATING_PROCEDURES.md` |
 | 23 | Business configuration interface | TESTED | Services/prices, forecast assumptions, expenses, knowledge, content: all editable without code |
 | 24 | Demo environment (fictional data) | IMPLEMENTED | `npm run db:seed:demo`; every record is labelled (DEMO) and uses @example.test |
-| 25 | Production readiness checklist | IMPLEMENTED | `docs/PRODUCTION_READINESS.md` |
+| 25 | Production readiness checklist | TESTED | `docs/PRODUCTION_READINESS.md`, `docs/GO_LIVE.md`, and an automated launch check (`npm run preflight -- --verify`) that blocks launch on missing secrets, test keys in production, unapproved prices or open legal [CONFIRM]s, and proves each connection with read-only calls |
 
 ## Blocked: what Felicia (or her team) needs to provide
 

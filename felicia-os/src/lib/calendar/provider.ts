@@ -19,6 +19,12 @@ export class GoogleCalendarProvider implements CalendarProvider {
   private token?: { value: string; exp: number };
   constructor(private calendarId: string, private sa: { client_email: string; private_key: string }, private fetchImpl: typeof fetch = fetch) {}
 
+  /** Read-only launch check: the service account can open the calendar. */
+  async verifyConnection() {
+    const c = (await this.api(`/calendars/${encodeURIComponent(this.calendarId)}`)) as { summary?: string; timeZone?: string };
+    return { calendar: c.summary ?? this.calendarId, timeZone: c.timeZone ?? "unknown" };
+  }
+
   private async accessToken() {
     if (this.token && this.token.exp > Date.now() + 60_000) return this.token.value;
     const key = await importPKCS8(this.sa.private_key, "RS256");
