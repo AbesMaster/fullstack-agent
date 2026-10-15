@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHero, Section, Disclaimer, CtaButton } from "@/components/ui";
 import { EventRegistrationForm } from "@/components/EventRegistrationForm";
@@ -46,8 +47,9 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <PageHero eyebrow={formatInZone(ev.startsAt, "Europe/London")} title={ev.title}>
+      <PageHero eyebrow={ev.serviceId === "return-to-wonder" ? `Return to Wonder · ${formatInZone(ev.startsAt, "Europe/London")}` : formatInZone(ev.startsAt, "Europe/London")} title={ev.title}>
         <p>{ev.location}</p>
+        {ev.serviceId === "return-to-wonder" && <p className="mt-3 text-sm"><Link className="text-gold-soft underline" href="/return-to-wonder">About Return to Wonder</Link></p>}
       </PageHero>
       <Section>
         {registered && <p role="status" className="mx-auto mb-8 max-w-3xl rounded-xl bg-sage/25 p-4">Thank you. Your payment is being confirmed and your place details will arrive by email shortly.</p>}

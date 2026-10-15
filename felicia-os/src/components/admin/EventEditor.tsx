@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-type Initial = { id: string; title: string; description: string; location: string; startsAt: string; endsAt: string; capacity: number; priceMinor: number; budgetMinor: number; includesBreathwork: boolean; isOnline: boolean; status: string };
+type Initial = { id: string; title: string; description: string; location: string; startsAt: string; endsAt: string; capacity: number; priceMinor: number; budgetMinor: number; includesBreathwork: boolean; isOnline: boolean; status: string; serviceId: string | null };
 
 async function post(body: unknown) {
   const r = await fetch("/api/admin/events", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -9,7 +9,7 @@ async function post(body: unknown) {
   return { ok: r.ok, j };
 }
 
-export function EventEditor({ mode, initial }: { mode: "create" | "edit"; initial?: Initial }) {
+export function EventEditor({ mode, initial, types }: { mode: "create" | "edit"; initial?: Initial; types: { id: string; name: string }[] }) {
   const [msg, setMsg] = useState("");
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,6 +27,7 @@ export function EventEditor({ mode, initial }: { mode: "create" | "edit"; initia
       includesBreathwork: f.get("breathwork") === "on",
       isOnline: f.get("online") === "on",
       status: f.get("status"),
+      serviceId: f.get("serviceId") || null,
     };
     setMsg("Saving…");
     const { ok, j } = mode === "create" ? await post({ action: "create", event: values }) : await post({ action: "update", id: initial!.id, patch: values });
@@ -44,6 +45,12 @@ export function EventEditor({ mode, initial }: { mode: "create" | "edit"; initia
   return (
     <form method="post" onSubmit={submit} className="grid gap-3 md:grid-cols-2">
       <label className="text-xs md:col-span-2">Title<input id={`${p}-title`} name="title" required minLength={3} maxLength={160} defaultValue={v?.title} className={input} /></label>
+      <label className="text-xs md:col-span-2">Type of event (it is also listed on that experience's page, e.g. Return to Wonder)
+        <select id={`${p}-type`} name="serviceId" defaultValue={v?.serviceId ?? ""} className={input}>
+          <option value="">General event</option>
+          {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+        </select>
+      </label>
       <label className="text-xs md:col-span-2">Description (shown on the public page)<textarea id={`${p}-description`} name="description" rows={4} maxLength={5000} defaultValue={v?.description} className={input} /></label>
       <label className="text-xs md:col-span-2">Location (venue and town, or "Online (Zoom)")<input id={`${p}-location`} name="location" required maxLength={300} defaultValue={v?.location} className={input} /></label>
       <label className="text-xs">Starts (UK time)<input id={`${p}-starts`} name="startsAt" type="datetime-local" required defaultValue={v?.startsAt} className={input} /></label>

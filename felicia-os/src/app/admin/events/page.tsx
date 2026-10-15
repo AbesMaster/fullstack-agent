@@ -2,7 +2,7 @@ import Link from "next/link";
 import { desc } from "drizzle-orm";
 import { db, requirePageUser } from "@/lib/server";
 import { programmeEvents } from "@/lib/db/schema";
-import { eventRoster } from "@/lib/programme/events";
+import { eventRoster, eventTypes } from "@/lib/programme/events";
 import { eventProfitability } from "@/lib/finance/finance";
 import { Card } from "@/components/admin/Stat";
 import { EventEditor } from "@/components/admin/EventEditor";
@@ -28,7 +28,7 @@ export default async function Page() {
     <div className="space-y-6">
       <h1 className="text-4xl">Events & workshops</h1>
       <p className="text-sm text-navy-800/70">Create an event as <strong>Planning</strong> (hidden), then set it to <strong>Open</strong> to publish it and start taking registrations. It switches to <strong>Full</strong> by itself when the places are taken.</p>
-      <Card title="New event"><EventEditor mode="create" /></Card>
+      <Card title="New event"><EventEditor mode="create" types={await eventTypes(d)} /></Card>
       <Card title={`All events (${events.length})`}>
         {events.length === 0 ? <p className="text-sm text-navy-800/60">No events yet.</p> : (
           <div className="overflow-x-auto">

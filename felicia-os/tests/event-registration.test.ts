@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { eq } from "drizzle-orm";
 import { harness, type Harness } from "./helpers";
-import { cancelRegistration, createEvent, EventError, expireRegistrationHolds, getEvent, publicEvents, registerForEvent, seatsTaken, updateEvent } from "@/lib/programme/events";
+import { cancelRegistration, createEvent, EventError, eventTypes, expireRegistrationHolds, getEvent, publicEvents, registerForEvent, seatsTaken, updateEvent } from "@/lib/programme/events";
 import { applyPaymentEvent } from "@/lib/payments/processing";
 import { agentTasks, eventRegistrations, payments } from "@/lib/db/schema";
 import { sendEventReminders } from "@/lib/agents/schedule";
@@ -103,6 +103,21 @@ describe("event registration", () => {
     expect((await publicEvents(h.db, NOW)).map((e) => e.id)).toEqual([open]);
     await expect(registerForEvent(h.db, { eventId: draft, ...who(1) }, NOW)).rejects.toMatchObject({ code: "unavailable" });
     await expect(registerForEvent(h.db, { eventId: open, ...who(1) }, new Date("2026-04-01T00:00:00Z"))).rejects.toMatchObject({ code: "unavailable" });
+  });
+
+  it("events can be listed under an experience type, such as Return to Wonder", async () => {
+    expect((await eventTypes(h.db)).map((t) => t.id)).toContain("return-to-wonder");
+    const general = await createEvent(h.db, { ...base, capacity: 5, priceMinor: 0 }, "user:t");
+    const rtw = await createEvent(h.db, { ...base, title: "Return to Wonder (test)", capacity: 8, priceMinor: 33300, serviceId: "return-to-wonder" }, "user:t");
+    expect((await publicEvents(h.db, NOW, { serviceId: "return-to-wonder" })).map((e) => e.id)).toEqual([rtw]);
+    expect((await publicEvents(h.db, NOW)).map((e) => e.id).sort()).toEqual([general, rtw].sort());
+    // Types are limited to group experiences; private sessions or unknown ids are refused.
+    await expect(createEvent(h.db, { ...base, capacity: 5, priceMinor: 0, serviceId: "signature-private-session" }, "user:t")).rejects.toBeInstanceOf(EventError);
+    await expect(updateEvent(h.db, general, { serviceId: "nope" }, "user:t")).rejects.toBeInstanceOf(EventError);
+    await updateEvent(h.db, general, { serviceId: "return-to-wonder" }, "user:t");
+    expect((await getEvent(h.db, general))!.serviceId).toBe("return-to-wonder");
+    await updateEvent(h.db, general, { serviceId: null }, "user:t");
+    expect((await getEvent(h.db, general))!.serviceId).toBeNull();
   });
 
   it("admin edits are validated; capacity can't drop below confirmed places; cancelling frees a place", async () => {

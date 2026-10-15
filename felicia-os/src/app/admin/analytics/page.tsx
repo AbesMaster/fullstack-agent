@@ -15,6 +15,11 @@ const BUTTON_NAMES: Record<string, string> = {
   cta_home_rtw: "Homepage: Discover Return to Wonder",
   cta_footer_discovery: "Homepage footer: Book discovery call",
   cta_event_details: "Events list: Details & booking",
+  cta_rtw_dates: "Return to Wonder: See upcoming dates",
+  cta_rtw_interest: "Return to Wonder: Register interest (hero)",
+  cta_rtw_empty_interest: "Return to Wonder: Register interest (no dates yet)",
+  cta_rtw_event: "Return to Wonder: Date details & booking",
+  cta_rtw_discovery: "Return to Wonder: Book discovery call",
 };
 const buttonName = (label: string) =>
   BUTTON_NAMES[label] ??

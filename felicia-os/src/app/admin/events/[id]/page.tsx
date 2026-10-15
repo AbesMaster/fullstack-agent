@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db, requirePageUser } from "@/lib/server";
-import { eventRoster, getEvent } from "@/lib/programme/events";
+import { eventRoster, eventTypes, getEvent } from "@/lib/programme/events";
 import { Card } from "@/components/admin/Stat";
 import { EventEditor, CancelRegistrationButton, ChecklistEditor } from "@/components/admin/EventEditor";
 import { AttendanceButtons } from "@/components/admin/AttendanceButtons";
@@ -30,7 +30,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <Card title="Details">
             <EventEditor
               mode="edit"
-              initial={{ id: ev.id, title: ev.title, description: ev.description, location: ev.location, startsAt: toZonedInputValue(ev.startsAt), endsAt: toZonedInputValue(ev.endsAt), capacity: ev.capacity, priceMinor: ev.priceMinor, budgetMinor: ev.budgetMinor, includesBreathwork: ev.includesBreathwork, isOnline: ev.isOnline, status: ev.status }}
+              initial={{ id: ev.id, title: ev.title, description: ev.description, location: ev.location, startsAt: toZonedInputValue(ev.startsAt), endsAt: toZonedInputValue(ev.endsAt), capacity: ev.capacity, priceMinor: ev.priceMinor, budgetMinor: ev.budgetMinor, includesBreathwork: ev.includesBreathwork, isOnline: ev.isOnline, status: ev.status, serviceId: ev.serviceId }}
+              types={await eventTypes(d)}
             />
           </Card>
         </div>

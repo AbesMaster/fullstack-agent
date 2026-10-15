@@ -30,6 +30,8 @@ Online sessions get their own Zoom meeting automatically, and the link goes into
 ## Events & workshops
 Create an event under **Events**. Start it as **Planning** while you prepare (visitors can't see it), then set it to **Open** to publish its page and take registrations. Free events confirm straight away; paid places are held for 30 minutes while the person pays, and are confirmed when the payment arrives. The event switches to **Full** on its own when places run out, and back to **Open** if someone cancels. Tick **Includes breathwork** to add a health notice and a required acknowledgment. Each event has a readiness checklist and a list of who's coming. Cancelling a paid place doesn't refund it automatically: request the refund separately so it goes through approvals. Dates are always entered in UK time.
 
+Choose a **Type of event** to list it on that experience's page too. Events typed **Return to Wonder** appear under *Upcoming dates* on the Return to Wonder page as soon as they're **Open**; until then the page invites visitors to register interest. Those sign-ups arrive as enquiries tagged Return to Wonder, so you can reply to everyone when dates are announced (only people who ticked the email box join your mailing list).
+
 ## Finance
 Record expenses, see the last six months of actual figures, compare three forecast scenarios, and edit the assumptions behind them. "Export actuals (CSV)" downloads a spreadsheet for your accountant.
 

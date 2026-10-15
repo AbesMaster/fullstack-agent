@@ -178,3 +178,41 @@ test("a client signs in to the portal with an emailed link", async ({ page, requ
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page.getByRole("button", { name: "Email me a sign-in link" })).toBeVisible();
 });
+
+test("Return to Wonder: dates Felicia publishes appear on the page, and visitors can register interest", async ({ page }) => {
+  // With no Return to Wonder dates yet, the page invites people to register interest.
+  await page.goto("/return-to-wonder");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Return to Wonder");
+  await expect(page.getByText("The next Return to Wonder is being planned")).toBeVisible();
+  await page.locator("#rtw-name").fill("Wonder Seeker (test)");
+  await page.locator("#rtw-email").fill("wonder-seeker@example.test");
+  await page.locator("#rtw-message").fill("A season of change.");
+  await page.getByRole("button", { name: "Register my interest" }).click();
+  await expect(page.getByText("You're on the list for Return to Wonder")).toBeVisible();
+
+  await signIn(page);
+  await page.goto("/admin/events");
+  const title = `Return to Wonder: Coast & Stars (e2e ${Date.now()})`;
+  await page.locator("#new-type").selectOption("return-to-wonder");
+  await page.locator("#new-title").fill(title);
+  await page.locator("#new-description").fill("Two days of coast walks, breath and starlit reflection. (Test event.)");
+  await page.locator("#new-location").fill("Cornwall, UK (test venue)");
+  const d = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
+  await page.locator("#new-starts").fill(`${d}T10:00`);
+  await page.locator("#new-ends").fill(`${d}T17:00`);
+  await page.locator("#new-capacity").fill("10");
+  await page.locator("#new-price").fill("333");
+  await page.locator("#new-status").selectOption("open");
+  await page.getByRole("button", { name: "Create event" }).click();
+  await expect(page.getByRole("heading", { name: title })).toBeVisible();
+
+  const visitor = await page.context().browser()!.newPage();
+  await visitor.goto("/return-to-wonder");
+  await expect(visitor.getByRole("heading", { name: title })).toBeVisible();
+  await expect(visitor.getByText("The next Return to Wonder is being planned")).toHaveCount(0);
+  await visitor.screenshot({ path: "e2e-artifacts/return-to-wonder.png", fullPage: true });
+  await visitor.getByRole("link", { name: "Details & booking" }).first().click();
+  await expect(visitor.getByRole("heading", { level: 1 })).toHaveText(title);
+  await expect(visitor.getByRole("link", { name: "About Return to Wonder" })).toBeVisible();
+  await visitor.close();
+});

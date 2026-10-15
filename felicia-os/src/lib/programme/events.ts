@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { DB } from "../db/client";
-import { agentTasks, contacts, eventRegistrations, programmeEvents } from "../db/schema";
+import { agentTasks, contacts, eventRegistrations, programmeEvents, services } from "../db/schema";
 import { upsertContact, PENDING_HOLD_MINUTES } from "../booking/booking";
 import { paymentProvider } from "../payments/provider";
 import { publish } from "../events/bus";
@@ -42,10 +42,10 @@ export async function seatsTaken(db: DB, eventId: string, now = new Date()) {
   return regs.filter((r) => occupiesSeat(r, now)).length;
 }
 
-/** Events visitors can see: open or full, not yet started. */
-export async function publicEvents(db: DB, now = new Date()) {
+/** Events visitors can see: open or full, not yet started. Optionally only one type (e.g. Return to Wonder). */
+export async function publicEvents(db: DB, now = new Date(), opts: { serviceId?: string } = {}) {
   const rows = await db.select().from(programmeEvents).where(inArray(programmeEvents.status, ["open", "full"])).orderBy(asc(programmeEvents.startsAt));
-  const upcoming = rows.filter((e) => e.startsAt > now);
+  const upcoming = rows.filter((e) => e.startsAt > now && (!opts.serviceId || e.serviceId === opts.serviceId));
   return Promise.all(upcoming.map(async (e) => ({ ...e, seatsLeft: Math.max(0, e.capacity - (await seatsTaken(db, e.id, now))) })));
 }
 
@@ -87,8 +87,21 @@ const DEFAULT_CHECKLIST = ["Venue confirmed (approval recorded)", "Insurance cov
  * Venue bookings, supplier spend and agreements stay outside the system and, when an
  * agent proposes them, go through approvals (venue.book, money.spend, agreement.sign).
  */
+/** The kinds of experience an event can be listed under (shown on that experience's page). */
+export async function eventTypes(db: DB) {
+  return (await db.select({ id: services.id, name: services.name, category: services.category }).from(services).orderBy(asc(services.sortOrder))).filter(
+    (s) => s.category === "Groups & workshops" || s.category === "Healing adventures",
+  );
+}
+
+async function assertEventType(db: DB, serviceId: string | null | undefined) {
+  if (!serviceId) return;
+  if (!(await eventTypes(db)).some((t) => t.id === serviceId)) throw new EventError("invalid", "Please choose a valid event type");
+}
+
 export async function createEvent(db: DB, input: z.input<typeof EventInputSchema>, actor: string) {
   const e = EventInputSchema.parse(input);
+  await assertEventType(db, e.serviceId);
   const id = newId("evn");
   await db.insert(programmeEvents).values({ id, ...e, checklist: DEFAULT_CHECKLIST });
   await audit(db, { actor, action: "event.created", target: id, metadata: { title: e.title, status: e.status, capacity: e.capacity, priceMinor: e.priceMinor } });
@@ -108,6 +121,7 @@ export const EventPatchSchema = z
     includesBreathwork: z.boolean(),
     isOnline: z.boolean(),
     status: z.enum(EVENT_STATUSES),
+    serviceId: z.string().max(80).nullable(),
     checklist: z.array(z.object({ item: z.string().min(1).max(200), done: z.boolean() })).max(40),
   })
   .partial();
@@ -116,6 +130,7 @@ export async function updateEvent(db: DB, id: string, patch: z.input<typeof Even
   const p = EventPatchSchema.parse(patch);
   const ev = await getEvent(db, id);
   if (!ev) throw new EventError("invalid", "Event not found");
+  await assertEventType(db, p.serviceId);
   const startsAt = p.startsAt ?? ev.startsAt;
   const endsAt = p.endsAt ?? ev.endsAt;
   if (endsAt <= startsAt) throw new EventError("invalid", "The event must end after it starts");
