@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { SITE } from "@/lib/site";
+import goldenHaloPortrait from "@/assets/felicia/golden-halo-portrait.jpg";
 import { CtaButton, MissingAsset, Section } from "@/components/ui";
 import { ServiceCard } from "@/components/ServiceCard";
 import { db } from "@/lib/server";
@@ -38,7 +40,14 @@ export default async function Home() {
             </div>
           </div>
           <div className="md:col-span-2">
-            <MissingAsset label="Portrait photograph of Felicia (approved)" className="aspect-[4/5] border-gold/40 bg-white/5 text-gold-soft" />
+            <Image
+              src={goldenHaloPortrait}
+              alt="Felicia Stefan framed by a golden halo against a starry midnight sky"
+              priority
+              placeholder="blur"
+              sizes="(min-width: 768px) 40vw, 100vw"
+              className="animate-fade-up aspect-[4/5] w-full rounded-3xl object-cover shadow-2xl shadow-black/40 ring-1 ring-gold/30"
+            />
           </div>
         </div>
       </section>

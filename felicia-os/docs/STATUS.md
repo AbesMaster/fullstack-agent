@@ -43,7 +43,7 @@ _Last updated: 2026-10-14, at the end of the first build session._
 5. **Resend** (or another provider) API key, plus DNS records (SPF/DKIM/DMARC) for metamastermindz.com.
 6. **Anthropic API key** for the AI drafting and chat. Without it, the chat uses rule-based answers.
 7. **JARVIS OS** API documentation and credentials.
-8. **Brand assets:** logo, photographs, approved biography, verified credentials, testimonials with consent.
+8. **Brand assets:** logo, landscape photographs for Return to Wonder, approved biography, verified credentials, testimonials with consent. Felicia's portrait is now on the homepage and About page (two cosmic-background edits of the supplied photo; a full-resolution original would be needed for print).
 9. **Owner approvals:** final prices, cancellation terms, and solicitor review of the legal pages.
 
 ## Pending approvals (business decisions)
