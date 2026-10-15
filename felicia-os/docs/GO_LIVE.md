@@ -6,7 +6,8 @@ The rule throughout: **rehearse first, then launch.** The site starts as *stagin
 
 ## 1. Decisions (Felicia, free)
 - [ ] Approve or change the ten prices (Command Center → Services; setting a service to **Active** approves its price).
-- [ ] Choose the web address (see **Choosing the address** below) and the public email address on it.
+- [x] Choose the web address: **feliciastefan.com** (decided 15 October 2026). Public email: `hello@feliciastefan.com` unless Felicia prefers another.
+- [ ] Buy feliciastefan.com in Felicia's name (see **Buying the domain** below).
 - [ ] Book a UK solicitor to review the Privacy, Terms and Cancellation pages. Every gap is marked **[CONFIRM]**.
 
 ## Choosing the address
@@ -16,6 +17,12 @@ metamastermindz.com is the owner's own site, so Felicia's site lives separately 
 - **Her own domain, e.g. `feliciastefan.com`** (available on 15 October 2026, about $16 for the first year). Best for her own brand, search results and moving it independently later. Buy it at any registrar (or the one already used for metamastermindz.com) in Felicia's name.
 
 Starting on a subdomain and moving to her own domain later is fine: change `APP_URL` and `EMAIL_FROM`, then redirect the old address.
+
+### Buying the domain (decided: feliciastefan.com)
+1. At any registrar (Cloudflare Registrar, Namecheap, Porkbun, or the one already used for metamastermindz.com), search for `feliciastefan.com` and buy it for 1 year or more. Turn on auto-renew and the free privacy (WHOIS) protection.
+2. Register it in **Felicia's name and email** (or the business's), so she owns it outright.
+3. Don't buy add-ons such as hosting, website builders or paid email: Render hosts the site and Resend sends the email.
+4. Once Render is set up, add the two records it shows (for `feliciastefan.com` and `www.feliciastefan.com`) in the registrar's DNS settings, plus the email records Resend shows.
 
 ## 2. Accounts (Felicia opens them, in her business's name)
 | Account | What it's for | Needed to launch? | Cost |
@@ -37,7 +44,7 @@ Starting on a subdomain and moving to her own domain later is fine: change `APP_
    `ADMIN_PASSWORD='…' npx tsx scripts/create-admin.mts felicia@… "Felicia Stefan" owner` and scan the code into an authenticator app.
 5. In Stripe (test mode) add a webhook to `https://<your-site>/api/webhooks/payments` for `checkout.session.completed`, `checkout.session.async_payment_failed`, `checkout.session.expired` and `charge.refunded`. Paste its signing secret into Render.
 6. In Resend, add the domain and put the DNS records it shows into the domain's settings.
-7. Point the address at Render (Render → Settings → Custom Domains shows the DNS record to add), then set `APP_URL` to it, e.g. `https://felicia.metamastermindz.com`, and `EMAIL_FROM` to an address on the same domain.
+7. Point the address at Render (Render → Settings → Custom Domains shows the DNS record to add), then set `APP_URL` to `https://feliciastefan.com` and `EMAIL_FROM` to `Felicia Stefan <hello@feliciastefan.com>`.
 
 ## 4. Launch check
 In the Render shell for the website:
