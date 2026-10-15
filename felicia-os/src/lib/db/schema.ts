@@ -469,3 +469,22 @@ export const analyticsEvents = pgTable(
   },
   (t) => [index("analytics_day_idx").on(t.day), index("analytics_name_day_idx").on(t.name, t.day)],
 );
+
+/* ------------------------------------------------------------------ */
+/* Client portal: passwordless sign-in links                          */
+/* Only a SHA-256 hash of each token is stored; tokens are single-use */
+/* and short-lived.                                                   */
+/* ------------------------------------------------------------------ */
+
+export const clientLoginTokens = pgTable(
+  "client_login_tokens",
+  {
+    id: id(),
+    contactId: text("contact_id").notNull().references(() => contacts.id),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("client_login_token_hash_uq").on(t.tokenHash), index("client_login_contact_idx").on(t.contactId)],
+);

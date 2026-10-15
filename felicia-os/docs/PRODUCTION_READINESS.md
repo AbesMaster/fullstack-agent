@@ -21,6 +21,7 @@ Tick each item with a date and initials. Production deploys need **owner approva
 - [ ] Refund request → approval → Stripe test refund appears
 - [ ] Enquiry → HubSpot contact created with no sensitive fields
 - [ ] Marketing email only to consented contacts; unsubscribe works (link and one-click)
+- [ ] Client portal: sign-in link arrives, works once, expires after 15 minutes; client sees only their own bookings
 - [ ] Emergency stop halts the worker and chat
 - [ ] Financial report reconciles with the Stripe test dashboard
 - [ ] Backup restore tested into a scratch database

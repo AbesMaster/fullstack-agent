@@ -28,6 +28,7 @@ Deliberately **one deployable app plus one worker process** with no n8n, queue b
 | `services/` | Configurable service catalogue (all prices start as *proposed*) |
 | `booking/` | Contacts, enquiries, availability (time zones, notice, buffers, external busy), booking, reschedule, cancel, encrypted intake |
 | `payments/` | Provider interface (Stripe and mock), normalised webhooks, idempotent payment recording, approval-gated refunds |
+| `portal/` | Client portal: hashed single-use sign-in links, client sessions (aud=client), the client's own overview, change requests, email preferences |
 | `video/` | Zoom (Server-to-Server OAuth) and mock providers; meeting lifecycle kept in step with bookings and online events |
 | `crm/`, `calendar/`, `email/` | Provider adapters. The email layer enforces consent, suppression and unsubscribe |
 | `events/` | Typed event schemas and outbox bus: exactly-once handler receipts, backoff, DLQ, emergency-stop aware |

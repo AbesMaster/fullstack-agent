@@ -21,6 +21,9 @@ Every price starts as **proposed** ("pricing being finalised" shows on the site)
 ## Enquiries & bookings
 See every enquiry, what the person is interested in, and whether they agreed to marketing emails. In the bookings table, "review needed" means the welcome form flagged something for you. Only you (the owner) can open those answers, and each time you do it's recorded.
 
+## Client portal
+Clients sign in at **/portal** with just their email: they receive a one-time link (no passwords to forget or reset). Inside they see their upcoming and past sessions, Zoom links, welcome form links, event places and payments, and can change their email preferences. If a client asks to reschedule or cancel, it appears under **Needs your attention** and in **Enquiries & bookings**. Nothing changes until you act, so you can apply your cancellation policy and decide on any refund. Their welcome-form answers are never shown to them in the portal.
+
 ## Zoom
 Online sessions get their own Zoom meeting automatically, and the link goes into the client's confirmation, reminder and reschedule emails. Online events share one meeting for everyone who registers (tick **Online event** when creating it). Start meetings from your own Zoom app as usual: the waiting room is on, so you let each person in, and nothing is recorded. If a session moves, its Zoom meeting moves too; if it's cancelled, the meeting is deleted. For services offered both ways, clients choose online or in person when they book, and the bookings list shows which.
 

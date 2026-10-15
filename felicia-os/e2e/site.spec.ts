@@ -144,3 +144,37 @@ test("admin requires sign-in with MFA and shows the Command Center", async ({ pa
   await expect(page.getByRole("cell", { name: "/" }).first()).toBeVisible();
   await page.screenshot({ path: "e2e-artifacts/analytics.png", fullPage: true });
 });
+
+test("a client signs in to the portal with an emailed link", async ({ page, request }) => {
+  // e2e-visitor@example.test booked a discovery call in an earlier test.
+  await page.goto("/portal");
+  await expect(page.getByRole("button", { name: "Email me a sign-in link" })).toBeEnabled();
+  await page.locator("#portal-email").fill("e2e-visitor@example.test");
+  await page.getByRole("button", { name: "Email me a sign-in link" }).click();
+  await expect(page.getByText(/a sign-in link is on its way/)).toBeVisible();
+
+  const mails = (await (await request.get("/api/dev/mock-emails?to=e2e-visitor@example.test")).json()) as { subject: string; text: string }[];
+  const link = mails.filter((m) => m.subject === "Your sign-in link").at(-1)!.text.match(/https?:\/\/\S+/)![0];
+  await page.goto(new URL(link).pathname + new URL(link).search);
+  await expect(page.getByRole("button", { name: "Sign in" })).toBeEnabled();
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/portal$/);
+  await expect(page.getByRole("heading", { name: /Welcome, E2E/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Discovery Call" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Join on Zoom" })).toBeVisible();
+  await page.screenshot({ path: "e2e-artifacts/portal.png", fullPage: true });
+
+  // The same link can't be used twice.
+  const reuse = await request.post("/api/portal/sign-in", { data: { token: new URL(link).searchParams.get("t") }, headers: { origin: new URL(page.url()).origin } });
+  expect(reuse.status()).toBe(400);
+
+  // A client session never opens the Command Center.
+  await page.goto("/admin");
+  await expect(page).toHaveURL(/login/);
+
+  await page.goto("/portal");
+  await page.locator("#pref-marketing").check();
+  await expect(page.getByText("You'll receive occasional updates.")).toBeVisible();
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page.getByRole("button", { name: "Email me a sign-in link" })).toBeVisible();
+});

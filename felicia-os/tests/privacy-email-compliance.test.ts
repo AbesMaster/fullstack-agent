@@ -39,8 +39,8 @@ describe("email consent", () => {
     expect(c!.marketingConsent).toBe(false);
   });
 
-  it("all 13 workflow templates render and declare a kind", () => {
-    expect(Object.keys(TEMPLATES)).toHaveLength(13);
+  it("all workflow templates render and declare a kind", () => {
+    expect(Object.keys(TEMPLATES)).toHaveLength(14);
     expect(() => renderTemplate("appointment_reminder", { name: "x" })).toThrow(/missing/);
   });
 });

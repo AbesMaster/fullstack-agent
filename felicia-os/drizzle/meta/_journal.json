@@ -36,6 +36,13 @@
       "when": 1792026042459,
       "tag": "0004_zoom",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792049478290,
+      "tag": "0005_client_portal",
+      "breakpoints": true
     }
   ]
 }

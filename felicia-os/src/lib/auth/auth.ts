@@ -72,7 +72,7 @@ export function requirePermission(user: SessionUser | null, p: Permission): Sess
 export const SESSION_COOKIE = "fos_session";
 const SESSION_HOURS = 12;
 
-function sessionKey() {
+export function sessionKey() {
   const s = env().SESSION_SECRET;
   if (!s) {
     if (env().APP_ENV === "production") throw new Error("SESSION_SECRET is required in production");
@@ -95,6 +95,8 @@ export async function readSessionToken(token: string | undefined): Promise<(Sess
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, sessionKey(), { algorithms: ["HS256"] });
+    // Client portal sessions are signed with the same key but must never open the Command Center.
+    if (payload.aud === "client" || !payload.role) return null;
     return { id: String(payload.sub), email: String(payload.email), name: String(payload.name), role: payload.role as Role, mfa: !!payload.mfa };
   } catch {
     return null;

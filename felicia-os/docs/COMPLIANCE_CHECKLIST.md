@@ -14,7 +14,7 @@ This is research and risk-flagging, **not legal advice**. Each item needs confir
 ## PECR (marketing email)
 - [ ] Marketing only with opt-in consent (built-in: unticked boxes, consent timestamp and source stored)
 - [ ] Unsubscribe in every marketing email (built-in: link + RFC 8058 one-click)
-- [ ] Cookie use reviewed. The site sets only the admin session cookie (strictly necessary). Built-in analytics store nothing on the visitor's device, keep no IP addresses or personal data, honour Global Privacy Control, and rotate the visitor salt daily. Confirm with the solicitor that no consent banner is needed, and mention the analytics in the privacy policy
+- [ ] Cookie use reviewed. The site sets only strictly necessary cookies: the admin session and, when a client signs in to their client area, the client session. Built-in analytics store nothing on the visitor's device, keep no IP addresses or personal data, honour Global Privacy Control, and rotate the visitor salt daily. Confirm with the solicitor that no consent banner is needed, and mention the analytics in the privacy policy
 
 ## Advertising (ASA / CAP Code)
 - [ ] No claims to treat or cure medical or psychological conditions (built-in claim checker blocks common forms)

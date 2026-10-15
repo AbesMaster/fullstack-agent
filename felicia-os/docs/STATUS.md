@@ -9,10 +9,10 @@ _Last updated: 2026-10-14, at the end of the first build session._
 | # | Deliverable | Status | Notes |
 |---|---|---|---|
 | 01 | Source-code repository | IMPLEMENTED | `felicia-os/` in this repo, on branch `claude/kind-darwin-rwtw7t` |
-| 02 | Premium responsive website | TESTED | 16 required pages plus booking, intake, feedback and unsubscribe. E2E: every public page renders. Real photos, logo and biography are **BLOCKED** on owner assets |
+| 02 | Website | TESTED | 16 required pages plus booking, event registration, intake, feedback and unsubscribe. **Client portal with password-free sign-in**: single-use emailed links (hashed, 15-minute expiry, rate-limited, no account discovery), separate client sessions that can never open the Command Center, upcoming and past sessions, Zoom links, welcome-form links, event places, payments, reschedule/cancel requests to Felicia, and email preferences. All pages load. Waiting on your photos, logo and biography |
 | 03 | Admin Command Center | TESTED | Overview, approvals, enquiries/bookings, finance, content, services, knowledge, agents, audit, emergency stop. MFA sign-in tested end-to-end |
 | 04 | Multi-agent orchestration layer | TESTED | 21 agents, tool allow-lists, approval gating, rate limits, task history, emergency stop |
-| 05 | Database schema and migrations | TESTED | Drizzle + PostgreSQL/pgvector; 5 migrations; tested on PGlite. **Not yet run on a managed Postgres** |
+| 05 | Database schema and migrations | TESTED | Drizzle + PostgreSQL/pgvector; 6 migrations; tested on PGlite. **Not yet run on a managed Postgres** |
 | 06 | Knowledge ingestion system | TESTED | PDF/DOCX/TXT/MD/CSV/JSON/approved URLs, versioning, metadata, access levels, pgvector search. The embedder is a local lexical one (see ARCHITECTURE) |
 | 07 | CRM integration (HubSpot) | TESTED (mock) | Real HubSpot client written and tested with a fake HTTP layer. **BLOCKED: no HubSpot token** |
 | 08 | Scheduling integration (Google Calendar + Zoom) | TESTED (mock) | Availability, buffers, time zones, double-booking prevention, reschedule and cancel. Zoom: a private meeting (waiting room, never recorded) is created for each online session and shared online event; the join link goes in confirmation, reschedule and reminder emails; meetings move with reschedules and are deleted on cancellation; outages retry without sending a link-less confirmation. Clients choose online or in person for hybrid services. **BLOCKED: no Google service account or Zoom app credentials** |
@@ -26,7 +26,7 @@ _Last updated: 2026-10-14, at the end of the first build session._
 | 16 | JARVIS integration adapter | TESTED (mock) | Contract, privacy redaction and signed-webhook transport. **BLOCKED: no JARVIS spec** (no endpoints were invented) |
 | 17 | Privacy and security controls | TESTED | RBAC, MFA, scrypt, signed sessions, CSRF origin check, rate limits, security headers, encryption, CRM data guard |
 | 18 | Audit logging | TESTED | Append-only, no sensitive payloads |
-| 19 | Automated tests | TESTED | 78 unit/integration + 7 E2E, all passing |
+| 19 | Automated tests | TESTED | 86 unit/integration + 8 E2E, all passing |
 | 20 | Deployment configuration | IMPLEMENTED | GitHub Actions CI, env template, migration/worker scripts, Dockerfile. **No staging host** |
 | 21 | Administrator documentation | IMPLEMENTED | `docs/ADMIN_GUIDE.md` |
 | 22 | Operating procedures | IMPLEMENTED | `docs/OPERATING_PROCEDURES.md` |

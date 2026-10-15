@@ -18,7 +18,8 @@ export type TemplateId =
   | "workshop_registration"
   | "event_reminder"
   | "cancellation_confirmation"
-  | "rescheduling_confirmation";
+  | "rescheduling_confirmation"
+  | "portal_sign_in";
 
 type Vars = Record<string, string>;
 type Template = { kind: TemplateKind; subject: (v: Vars) => string; body: (v: Vars) => string; requiredVars: string[] };
@@ -105,6 +106,12 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     requiredVars: ["name", "service", "when"],
     subject: () => "Your session has been rescheduled",
     body: (v) => `Dear ${v.name},\n\nYour ${v.service} is now on ${v.when}.${v.joinInfo ? `\n\n${v.joinInfo}` : ""}${SIGN_OFF}`,
+  },
+  portal_sign_in: {
+    kind: "transactional",
+    requiredVars: ["name", "link"],
+    subject: () => "Your sign-in link",
+    body: (v) => `Dear ${v.name},\n\nHere is your link to sign in to your MetaMasterMindz client area:\n${v.link}\n\nIt works once and expires in 15 minutes. If you didn't ask for it, you can ignore this email; nobody can sign in without it.${SIGN_OFF}`,
   },
 };
 
