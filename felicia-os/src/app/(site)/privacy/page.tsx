@@ -20,7 +20,7 @@ export default function Page() {
             <li><strong>Welcome & consent form</strong> — intentions for your session and, where breathwork is involved, health screening answers. This is <em>special category data</em>; we process it only with your explicit consent so that sessions can be delivered safely. It is encrypted and accessible only to Felicia.</li>
             <li><strong>Payments</strong> — processed by our payment provider ([CONFIRM: Stripe / PayPal]). We never see or store full card details.</li>
             <li><strong>Marketing emails</strong> — only if you opt in (consent). Every email has a one-click unsubscribe. We comply with PECR.</li>
-            <li><strong>Website analytics</strong> — privacy-conscious, aggregate analytics [CONFIRM provider and whether cookies/consent banner are needed].</li>
+            <li><strong>Website analytics</strong> — we count visits with our own cookieless analytics. Nothing is stored on your device, and we don't keep your IP address or anything that identifies you. A visit can only be recognised for one day, using a code that's discarded every night. If your browser sends a Global Privacy Control signal, you aren't counted at all. Lawful basis: legitimate interests in understanding how the site is used. Records are deleted after 13 months.</li>
           </ul>
           <h2>AI assistance</h2>
           <p>We use AI tools to help run the business — for example, to answer routine website questions (the chat assistant always identifies itself as AI) and to draft content that a human reviews. Your health information is never shared with AI tools or our CRM.</p>

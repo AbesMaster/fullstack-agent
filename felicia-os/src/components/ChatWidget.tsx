@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { track } from "@/lib/analytics";
 
 type Turn = { role: "user" | "assistant"; text: string; link?: string | null };
 
@@ -54,7 +55,7 @@ export function ChatWidget() {
           </form>
         </section>
       )}
-      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="ml-auto block rounded-full bg-navy-900 px-5 py-3 text-sm text-ivory shadow-lg hover:bg-navy-700">
+      <button type="button" onClick={() => setOpen((v) => { if (!v) track("chat_opened"); return !v; })} aria-expanded={open} className="ml-auto block rounded-full bg-navy-900 px-5 py-3 text-sm text-ivory shadow-lg hover:bg-navy-700">
         {open ? "Close chat" : "Questions? Chat with our AI assistant"}
       </button>
     </div>

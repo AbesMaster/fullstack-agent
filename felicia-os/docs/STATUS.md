@@ -12,7 +12,7 @@ _Last updated: 2026-10-14, at the end of the first build session._
 | 02 | Premium responsive website | TESTED | 16 required pages plus booking, intake, feedback and unsubscribe. E2E: every public page renders. Real photos, logo and biography are **BLOCKED** on owner assets |
 | 03 | Admin Command Center | TESTED | Overview, approvals, enquiries/bookings, finance, content, services, knowledge, agents, audit, emergency stop. MFA sign-in tested end-to-end |
 | 04 | Multi-agent orchestration layer | TESTED | 21 agents, tool allow-lists, approval gating, rate limits, task history, emergency stop |
-| 05 | Database schema and migrations | TESTED | Drizzle + PostgreSQL/pgvector; 3 migrations; tested on PGlite. **Not yet run on a managed Postgres** |
+| 05 | Database schema and migrations | TESTED | Drizzle + PostgreSQL/pgvector; 4 migrations; tested on PGlite. **Not yet run on a managed Postgres** |
 | 06 | Knowledge ingestion system | TESTED | PDF/DOCX/TXT/MD/CSV/JSON/approved URLs, versioning, metadata, access levels, pgvector search. The embedder is a local lexical one (see ARCHITECTURE) |
 | 07 | CRM integration (HubSpot) | TESTED (mock) | Real HubSpot client written and tested with a fake HTTP layer. **BLOCKED: no HubSpot token** |
 | 08 | Scheduling integration (Google Calendar) | TESTED (mock) | Availability, buffers, time zones, double-booking prevention, reschedule and cancel. **BLOCKED: no Google service account.** Zoom links not yet implemented |
@@ -22,11 +22,11 @@ _Last updated: 2026-10-14, at the end of the first build session._
 | 12 | Client intake and consent | TESTED | AES-256-GCM encrypted, signed links, breathwork screening goes to owner review, owner-only audited access. Consent wording needs legal review |
 | 13 | Event registration system | TESTED | Public event pages with self-service registration; free and paid (hosted checkout) places; capacity enforced with 30-minute unpaid holds; breathwork acknowledgment; confirmation and day-before reminder emails; Command Center events page (create, publish, edit, readiness checklist, registrant list, cancel). Payments tested on stand-in only |
 | 14 | Financial reporting dashboard | TESTED | Actual / forecast / target kept separate, 3 editable scenarios, budget alerts, CSV export, printable |
-| 15 | Performance analytics | IN PROGRESS | Funnel metrics computed from data; cookieless analytics hook (`data-analytics` + Plausible) wired. **BLOCKED: no analytics account** |
+| 15 | Performance analytics | TESTED | Built-in, first-party, cookieless analytics (no account needed): visits, pages, channels, sources, UTM campaigns, devices, button clicks, chat opens; website journey and acquisition funnels A–D from business records; revenue, refund rate, conversion and show-up rates; attendance marking; 13-month retention. Not yet run against real traffic |
 | 16 | JARVIS integration adapter | TESTED (mock) | Contract, privacy redaction and signed-webhook transport. **BLOCKED: no JARVIS spec** (no endpoints were invented) |
 | 17 | Privacy and security controls | TESTED | RBAC, MFA, scrypt, signed sessions, CSRF origin check, rate limits, security headers, encryption, CRM data guard |
 | 18 | Audit logging | TESTED | Append-only, no sensitive payloads |
-| 19 | Automated tests | TESTED | 62 unit/integration + 7 E2E, all passing |
+| 19 | Automated tests | TESTED | 69 unit/integration + 7 E2E, all passing |
 | 20 | Deployment configuration | IMPLEMENTED | GitHub Actions CI, env template, migration/worker scripts, Dockerfile. **No staging host** |
 | 21 | Administrator documentation | IMPLEMENTED | `docs/ADMIN_GUIDE.md` |
 | 22 | Operating procedures | IMPLEMENTED | `docs/OPERATING_PROCEDURES.md` |

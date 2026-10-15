@@ -7,7 +7,7 @@ The AI-assisted business operating system for **MetaMasterMindz**, Felicia Stefa
 It includes:
 
 - **The public website.** 16 pages plus booking, event registration, checkout, client welcome form, feedback and unsubscribe pages, with a clearly labelled AI chat assistant.
-- **The Felicia Command Center** (`/admin`). Business performance, approvals, enquiries and bookings, events, finance, content, services, knowledge, the 21 agents, an audit log and an emergency stop.
+- **The Felicia Command Center** (`/admin`). Business performance, approvals, enquiries and bookings, events, finance, analytics, content, services, knowledge, the 21 agents, an audit log and an emergency stop.
 - **A multi-agent layer.** Felicia Commander plus 20 specialist agents. Each one has a fixed tool allow-list, actions it can only *request* (never perform), hourly limits and a task history. Agents hand work to each other through typed events, not free-form chat.
 - **Integrations.** Stripe (hosted checkout and signed webhooks), HubSpot, Google Calendar, Resend email, Anthropic Claude and the JARVIS connector. Each one runs against a clearly labelled **mock** until real credentials are added.
 
@@ -28,7 +28,7 @@ In development the database is **PGlite**, a real PostgreSQL with pgvector that 
 
 ```bash
 npm run typecheck
-npm test                              # 62 unit/integration tests against real Postgres (PGlite)
+npm test                              # 69 unit/integration tests against real Postgres (PGlite)
 npm run build
 npm run test:e2e                      # 7 browser end-to-end tests (needs a Chromium; set PW_CHROMIUM_PATH if preinstalled)
 ```

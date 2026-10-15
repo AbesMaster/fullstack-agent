@@ -137,4 +137,10 @@ test("admin requires sign-in with MFA and shows the Command Center", async ({ pa
   await expect(page.getByText("E2E Payer (test)")).toBeVisible();
   await page.goto("/admin/finance");
   await page.screenshot({ path: "e2e-artifacts/finance.png", fullPage: true });
+  await page.goto("/admin/analytics?days=7");
+  await expect(page.getByRole("heading", { name: "Analytics" })).toBeVisible();
+  // Earlier tests browsed the public site, so cookieless page views were recorded.
+  await expect(page.getByRole("cell", { name: "/sessions", exact: true })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "/" }).first()).toBeVisible();
+  await page.screenshot({ path: "e2e-artifacts/analytics.png", fullPage: true });
 });

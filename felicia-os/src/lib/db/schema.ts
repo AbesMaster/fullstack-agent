@@ -433,3 +433,29 @@ export const feedback = pgTable(
   },
   (t) => [uniqueIndex("feedback_booking_uq").on(t.bookingId)],
 );
+
+/* ------------------------------------------------------------------ */
+/* First-party, cookieless website analytics                          */
+/* No cookies, no IP addresses, no personal data. A visitor is only    */
+/* recognisable within one day via a salted hash whose salt is thrown  */
+/* away daily, so visits can't be linked across days or to a person.   */
+/* ------------------------------------------------------------------ */
+
+export const analyticsEvents = pgTable(
+  "analytics_events",
+  {
+    id: id(),
+    day: date("day").notNull(),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+    name: text("name").notNull(), // pageview | cta_click | enquiry_submitted | booking_requested | booking_confirmed | event_registration | chat_opened
+    path: text("path").notNull(),
+    label: text("label"), // e.g. which CTA was clicked
+    referrerHost: text("referrer_host"),
+    utmSource: text("utm_source"),
+    utmMedium: text("utm_medium"),
+    utmCampaign: text("utm_campaign"),
+    device: text("device").notNull(), // mobile | tablet | desktop
+    visitorHash: text("visitor_hash").notNull(),
+  },
+  (t) => [index("analytics_day_idx").on(t.day), index("analytics_name_day_idx").on(t.name, t.day)],
+);

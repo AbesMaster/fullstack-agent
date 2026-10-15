@@ -1,9 +1,18 @@
 /**
- * Privacy-conscious analytics: no cookies, no personal data. Events are sent to the
- * configured provider (e.g. Plausible) if NEXT_PUBLIC_ANALYTICS_DOMAIN is set; otherwise no-op.
+ * Browser side of FELICIA OS's own cookieless analytics. Sends a tiny beacon to
+ * /api/analytics; stores nothing on the device. Honours Global Privacy Control.
  */
 export function track(event: string, props: Record<string, string | number> = {}) {
   if (typeof window === "undefined") return;
-  const w = window as unknown as { plausible?: (e: string, o?: { props: Record<string, string | number> }) => void };
-  w.plausible?.(event, { props });
+  const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
+  if (nav.globalPrivacyControl) return;
+  const label = props.label ?? props.service ?? props.event;
+  const body = JSON.stringify({ n: event, u: location.href, l: label != null ? String(label) : null, r: event === "pageview" ? document.referrer || null : null });
+  try {
+    if (!navigator.sendBeacon?.("/api/analytics", new Blob([body], { type: "text/plain" }))) {
+      void fetch("/api/analytics", { method: "POST", body, keepalive: true, headers: { "content-type": "text/plain" } }).catch(() => undefined);
+    }
+  } catch {
+    /* never let analytics break the page */
+  }
 }

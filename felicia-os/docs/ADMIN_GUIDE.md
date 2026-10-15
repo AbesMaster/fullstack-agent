@@ -27,6 +27,9 @@ Create an event under **Events**. Start it as **Planning** while you prepare (vi
 ## Finance
 Record expenses, see the last six months of actual figures, compare three forecast scenarios, and edit the assumptions behind them. "Export actuals (CSV)" downloads a spreadsheet for your accountant.
 
+## Analytics
+See how many people visit, which pages they read, where they come from and which buttons they press, alongside your bookings and payments. Choose the last 7, 30 or 90 days. The four funnels follow the routes in your plan: social media, workshops, partner referrals and events. To see which posts work, add tracking tags to links you share (the page shows an example). After a session or event, press **Came** or **No-show** next to each person so your show-up rate is accurate. No cookies or personal details are used, so there's no cookie banner to manage.
+
 ## Content
 Write or paste a draft, then **Submit for approval**. An automatic check flags risky wording (cure claims, guarantees, unverified titles, false urgency). Blocked drafts come back with advice. Once approved, social posts appear as a ready-to-post pack until the platform connections are set up.
 

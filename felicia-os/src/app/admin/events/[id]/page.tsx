@@ -4,6 +4,7 @@ import { db, requirePageUser } from "@/lib/server";
 import { eventRoster, getEvent } from "@/lib/programme/events";
 import { Card } from "@/components/admin/Stat";
 import { EventEditor, CancelRegistrationButton, ChecklistEditor } from "@/components/admin/EventEditor";
+import { AttendanceButtons } from "@/components/admin/AttendanceButtons";
 import { formatInZone, toZonedInputValue } from "@/lib/booking/time";
 import { formatMoney } from "@/lib/util";
 
@@ -45,7 +46,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                   <tr key={r.id} className="border-t border-navy-900/5">
                     <td className="p-2">{c.name}</td>
                     <td className="p-2">{c.email}</td>
-                    <td className="p-2">{r.status === "pending_payment" ? "awaiting payment" : r.status}</td>
+                    <td className="p-2">{ev.startsAt < new Date() && ["confirmed", "attended", "no_show"].includes(r.status) ? <AttendanceButtons kind="registration" id={r.id} status={r.status} /> : r.status === "pending_payment" ? "awaiting payment" : r.status}</td>
                     <td className="p-2 text-right tabular-nums">{r.amountMinor === 0 ? "Free" : formatMoney(r.amountMinor)}</td>
                     <td className="p-2 whitespace-nowrap">{r.createdAt.toLocaleDateString("en-GB")}</td>
                     <td className="p-2 text-right">{(r.status === "confirmed" || r.status === "pending_payment") && <CancelRegistrationButton id={r.id} paid={r.status === "confirmed" && r.amountMinor > 0} />}</td>

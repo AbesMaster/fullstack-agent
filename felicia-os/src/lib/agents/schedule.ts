@@ -2,6 +2,7 @@ import { and, between, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import { agentTasks, bookings, contacts, emailLog, enquiries, eventRegistrations, programmeEvents, services } from "../db/schema";
 import { expireRegistrationHolds } from "../programme/events";
+import { purgeOldAnalytics } from "../analytics/analytics";
 import { recordTask, isEmergencyStopped, listPendingApprovals } from "./controls";
 import { ownerAttentionItems } from "./workflows";
 import { sendTemplate } from "../email/send";
@@ -169,6 +170,7 @@ export async function runDueJobs(db: DB, now = new Date()) {
   };
   await daily("report:daily_brief", "executive-ops", 7, () => morningBrief(db, now));
   await daily("finance:daily_ops", "finance", 8, () => financialOps(db, now));
+  await daily("analytics:retention", "website-dev", 3, () => purgeOldAnalytics(db, now));
   await daily("report:evening_summary", "executive-ops", 19, async () => ({ ...(await morningBrief(db, now)), kind: "evening_summary", title: `Evening summary — ${day}` }));
 
   if (now.getUTCDay() === 1) await daily("report:weekly", "commander", 8, () => periodReport(db, "weekly", now));
