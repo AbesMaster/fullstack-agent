@@ -7,7 +7,7 @@ The rule throughout: **rehearse first, then launch.** The site starts as *stagin
 ## 1. Decisions (Felicia, free)
 - [ ] Approve or change the ten prices (Command Center → Services; setting a service to **Active** approves its price).
 - [x] Choose the web address: **feliciastefan.com** (decided 15 October 2026). Public email: `hello@feliciastefan.com` unless Felicia prefers another.
-- [x] Buy feliciastefan.com (bought 15 October 2026). Next: connect it once Render is set up (step 3.7).
+- [x] Buy feliciastefan.com (bought 15 October 2026; registered to and managed by the MetaMasterMindz owner, who handles its DNS settings and renewal). Next: connect it once Render is set up (step 3.7).
 - [ ] Book a UK solicitor to review the Privacy, Terms and Cancellation pages. Every gap is marked **[CONFIRM]**.
 
 ## Choosing the address
