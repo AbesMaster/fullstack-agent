@@ -20,7 +20,7 @@ export function KnowledgeUpload({ sections, docs }: { sections: Record<string, s
       <label className="text-xs">Access<select name="accessLevel" className={input}><option value="internal">Internal</option><option value="public">Public (website assistant may use)</option><option value="restricted">Restricted</option></select></label>
       <label className="text-xs">Replaces (new version of)<select name="replacesDocumentId" className={input}><option value="">— new document —</option>{docs.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}</select></label>
       <label className="text-xs">File (PDF, DOCX, TXT, MD, CSV, JSON)<input name="file" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json" className={input} /></label>
-      <label className="text-xs md:col-span-2">…or approved URL (metamastermindz.com)<input name="url" type="url" placeholder="https://metamastermindz.com/…" className={input} /></label>
+      <label className="text-xs md:col-span-2">…or a page from your own website<input name="url" type="url" placeholder="https://…" className={input} /></label>
       <label className="text-xs md:col-span-2">…or paste text<textarea name="text" rows={4} className={input} /></label>
       <div className="md:col-span-2"><button className="rounded-full bg-navy-900 px-4 py-2 text-sm text-ivory">Save to knowledge base</button> <span role="status" className="ml-2 text-sm">{msg}</span></div>
     </form>

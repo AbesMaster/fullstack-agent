@@ -3,6 +3,7 @@ import { eq, sql, inArray } from "drizzle-orm";
 import type { DB } from "../db/client";
 import { EMBEDDING_DIM, knowledgeChunks, knowledgeDocuments } from "../db/schema";
 import { audit } from "../audit/audit";
+import { publicUrl } from "../config/env";
 import { newId, sha256 } from "../util";
 
 /**
@@ -136,12 +137,15 @@ export function htmlToText(html: string) {
     .trim();
 }
 
-/** Only URLs on these hosts may be ingested (SSRF guard + "approved sources" rule). */
-export const APPROVED_URL_HOSTS = ["metamastermindz.com", "www.metamastermindz.com"];
+/** Only URLs on the site's own address may be ingested (SSRF guard + "approved sources" rule). */
+export function approvedUrlHosts() {
+  const host = new URL(publicUrl()).hostname.replace(/^www\./, "");
+  return [host, `www.${host}`];
+}
 
 export async function fetchApprovedUrl(url: string, fetchImpl: typeof fetch = fetch) {
   const u = new URL(url);
-  if (u.protocol !== "https:" || !APPROVED_URL_HOSTS.includes(u.hostname)) throw new Error(`URL host not approved for ingestion: ${u.hostname}`);
+  if (u.protocol !== "https:" || !approvedUrlHosts().includes(u.hostname)) throw new Error(`URL host not approved for ingestion: ${u.hostname}`);
   const res = await fetchImpl(u, { redirect: "error" });
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
   return res.text();

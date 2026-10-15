@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { harness, type Harness } from "./helpers";
 import { runPreflight, summarise } from "@/lib/launch/preflight";
 import type { Env } from "@/lib/config/env";
-import { resetEnvCache } from "@/lib/config/env";
+import { publicUrl, resetEnvCache } from "@/lib/config/env";
 import { createUser } from "@/lib/auth/auth";
 import { updateService, listServices } from "@/lib/services/catalogue";
 import { setVideoProviderForTests, videoProvider, VideoError } from "@/lib/video/provider";
@@ -49,6 +49,15 @@ describe("launch check (preflight)", () => {
     expect(find(checks, "Content", "Prices approved")!.result).toBe("fail");
     expect(find(checks, "Content", "Legal pages reviewed")!.detail).toContain("terms");
     expect(summarise(checks).ready).toBe(false);
+  });
+
+  it("the site can live on any domain, but emails must come from that domain", async () => {
+    const sub = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://felicia.metamastermindz.com", EMAIL_FROM: "Felicia <hello@metamastermindz.com>" }) });
+    expect(find(sub, "Email", "Sending address")!.result).toBe("pass");
+    const own = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://www.feliciastefan.com", EMAIL_FROM: "Felicia <hello@feliciastefan.com>" }) });
+    expect(find(own, "Email", "Sending address")!.result).toBe("pass");
+    const mismatch = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://feliciastefan.com", EMAIL_FROM: "Felicia <hello@metamastermindz.com>" }) });
+    expect(find(mismatch, "Email", "Sending address")!.result).toBe("fail");
   });
 
   it("refuses live payment keys outside production", async () => {
@@ -111,5 +120,11 @@ describe("production never fakes Zoom links or emails", () => {
     Object.assign(process.env, { APP_ENV: "production", EMAIL_PROVIDER_API_KEY: "" });
     resetEnvCache();
     expect(() => emailTransport()).toThrow(/required in production/);
+  });
+});
+
+describe("site address", () => {
+  it("comes from APP_URL, without a trailing slash", () => {
+    expect(publicUrl({ APP_URL: "https://feliciastefan.com/" } as Env)).toBe("https://feliciastefan.com");
   });
 });

@@ -14,7 +14,7 @@ envVarGroups:
       - key: APP_ENV
         value: staging
       - key: APP_URL
-        sync: false # e.g. https://metamastermindz.com once the domain is connected
+        sync: false # Felicia's address once connected, e.g. https://feliciastefan.com or https://felicia.metamastermindz.com
       - key: SESSION_SECRET
         generateValue: true
       - key: DATA_ENCRYPTION_KEY
@@ -28,7 +28,7 @@ envVarGroups:
       - key: EMAIL_PROVIDER_API_KEY
         sync: false
       - key: EMAIL_FROM
-        value: "Felicia at MetaMasterMindz <hello@metamastermindz.com>"
+        sync: false # e.g. "Felicia Stefan <hello@feliciastefan.com>", on the same domain as APP_URL
       - key: ZOOM_ACCOUNT_ID
         sync: false
       - key: ZOOM_CLIENT_ID

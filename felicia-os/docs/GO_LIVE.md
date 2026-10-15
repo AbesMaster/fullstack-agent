@@ -6,13 +6,21 @@ The rule throughout: **rehearse first, then launch.** The site starts as *stagin
 
 ## 1. Decisions (Felicia, free)
 - [ ] Approve or change the ten prices (Command Center → Services; setting a service to **Active** approves its price).
-- [ ] Confirm the public email address (currently `hello@metamastermindz.com`).
+- [ ] Choose the web address (see **Choosing the address** below) and the public email address on it.
 - [ ] Book a UK solicitor to review the Privacy, Terms and Cancellation pages. Every gap is marked **[CONFIRM]**.
+
+## Choosing the address
+metamastermindz.com is the owner's own site, so Felicia's site lives separately and nothing on the main site changes. Two options, and the system works the same with either (the address is one setting, `APP_URL`):
+
+- **A subdomain, e.g. `felicia.metamastermindz.com`.** No cost and ready in minutes: the domain owner adds one DNS record (a CNAME pointing at Render). Emails can be sent from `hello@felicia.metamastermindz.com`, verified separately in Resend, so the main domain's email is untouched.
+- **Her own domain, e.g. `feliciastefan.com`** (available on 15 October 2026, about $16 for the first year). Best for her own brand, search results and moving it independently later. Buy it at any registrar (or the one already used for metamastermindz.com) in Felicia's name.
+
+Starting on a subdomain and moving to her own domain later is fine: change `APP_URL` and `EMAIL_FROM`, then redirect the old address.
 
 ## 2. Accounts (Felicia opens them, in her business's name)
 | Account | What it's for | Needed to launch? | Cost |
 |---|---|---|---|
-| **Domain** (metamastermindz.com) | The website address and email sending | Yes | ~£10–20/year (if not already owned) |
+| **Domain** (see below) | The website address and email sending | Yes | Subdomain: no cost. Own domain: ~$16/year |
 | **Render** (render.com) | Hosts the website, background worker and database | Yes | ≈ $20/month |
 | **Stripe** (stripe.com) | Card payments | Yes | 1.5% + 20p per UK card, no monthly fee |
 | **Resend** (resend.com) | Booking confirmations, sign-in links, receipts | Yes | Free up to 3,000 emails/month |
@@ -29,7 +37,7 @@ The rule throughout: **rehearse first, then launch.** The site starts as *stagin
    `ADMIN_PASSWORD='…' npx tsx scripts/create-admin.mts felicia@… "Felicia Stefan" owner` and scan the code into an authenticator app.
 5. In Stripe (test mode) add a webhook to `https://<your-site>/api/webhooks/payments` for `checkout.session.completed`, `checkout.session.async_payment_failed`, `checkout.session.expired` and `charge.refunded`. Paste its signing secret into Render.
 6. In Resend, add the domain and put the DNS records it shows into the domain's settings.
-7. Point the domain at Render (Render → Settings → Custom Domains), then set `APP_URL` to `https://metamastermindz.com`.
+7. Point the address at Render (Render → Settings → Custom Domains shows the DNS record to add), then set `APP_URL` to it, e.g. `https://felicia.metamastermindz.com`, and `EMAIL_FROM` to an address on the same domain.
 
 ## 4. Launch check
 In the Render shell for the website:

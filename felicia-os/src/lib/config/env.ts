@@ -50,6 +50,11 @@ export function env(): Env {
   return cached;
 }
 
+/** The site's public address with no trailing slash, e.g. https://felicia.metamastermindz.com. Server-side only. */
+export function publicUrl(e: Env = env()) {
+  return e.APP_URL.replace(/\/+$/, "");
+}
+
 /** For tests only. */
 export function resetEnvCache() {
   cached = undefined;

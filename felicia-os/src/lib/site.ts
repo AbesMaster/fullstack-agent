@@ -1,14 +1,13 @@
 export const SITE = {
   name: "MetaMasterMindz",
   owner: "Felicia Stefan",
-  url: "https://metamastermindz.com",
+  // The public address comes from APP_URL (see publicUrl() in config/env), so the site can live on any domain.
   philosophy: "Explore the Earth. Open the Heart. Remember Who You Are.",
   signature: "Return to Wonder",
   heroTitle: "Your next chapter begins within.",
   heroSub: "Reconnect with yourself. Rediscover your inner power. Create a life aligned with who you truly are.",
   primaryCta: "Book Your Complimentary Discovery Call",
   secondaryCta: "Explore Healing Experiences",
-  contactEmail: "hello@metamastermindz.com", // [CONFIRM] placeholder until Felicia approves the public address
   wellbeingDisclaimer:
     "Felicia's sessions support personal development and wellbeing. They are not a substitute for medical, psychological or psychiatric care, and no specific outcome is promised. If you have a health condition, please speak to a qualified healthcare professional.",
 };

@@ -74,6 +74,10 @@ export async function runPreflight(db: DB | null, input: PreflightInput): Promis
   else if (!isProd && stripeLive) add("Payments", "Stripe", "fail", "A LIVE key is set outside production: rehearsals would take real money");
   else add("Payments", "Stripe", "pass", `${stripeLive ? "Live" : "Test"} keys set`);
 
+  const fromDomain = (e.EMAIL_FROM.match(/@([^>\s]+)/)?.[1] ?? "").toLowerCase();
+  const siteHost = url?.hostname.toLowerCase().replace(/^www\./, "") ?? "";
+  const related = !!fromDomain && !!siteHost && (fromDomain === siteHost || siteHost.endsWith(`.${fromDomain}`) || fromDomain.endsWith(`.${siteHost}`));
+  if (target !== "development") add("Email", "Sending address", related ? "pass" : gap, related ? `${e.EMAIL_FROM} matches the site address` : `EMAIL_FROM (${e.EMAIL_FROM}) isn't on the site's domain (${siteHost}). Use an address on Felicia's domain so emails look genuine and reach the inbox.`);
   add("Email", "Email provider", e.EMAIL_PROVIDER_API_KEY ? "pass" : "fail", e.EMAIL_PROVIDER_API_KEY ? `Sending as ${e.EMAIL_FROM}` : "EMAIL_PROVIDER_API_KEY is required: booking confirmations, sign-in links and receipts depend on it");
   const zoom = !!(e.ZOOM_ACCOUNT_ID && e.ZOOM_CLIENT_ID && e.ZOOM_CLIENT_SECRET);
   add("Video", "Zoom", zoom ? "pass" : gap, zoom ? "Credentials set" : "Not connected: online sessions and online events can't get meeting links");

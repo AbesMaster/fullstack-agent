@@ -9,6 +9,7 @@ import { publicEvents } from "@/lib/programme/events";
 import { formatInZone } from "@/lib/booking/time";
 import { formatMoney, formatPriceRange } from "@/lib/util";
 import { SITE } from "@/lib/site";
+import { publicUrl } from "@/lib/config/env";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -74,9 +75,9 @@ export default async function Page() {
     endDate: e.endsAt.toISOString(),
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: e.isOnline ? "https://schema.org/OnlineEventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
-    location: e.isOnline ? { "@type": "VirtualLocation", url: `${SITE.url}/events/${e.id}` } : { "@type": "Place", name: e.location, address: e.location },
-    organizer: { "@type": "Person", name: SITE.owner, url: SITE.url },
-    offers: { "@type": "Offer", price: (e.priceMinor / 100).toFixed(2), priceCurrency: "GBP", availability: e.seatsLeft > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut", url: `${SITE.url}/events/${e.id}` },
+    location: e.isOnline ? { "@type": "VirtualLocation", url: `${publicUrl()}/events/${e.id}` } : { "@type": "Place", name: e.location, address: e.location },
+    organizer: { "@type": "Person", name: SITE.owner, url: publicUrl() },
+    offers: { "@type": "Offer", price: (e.priceMinor / 100).toFixed(2), priceCurrency: "GBP", availability: e.seatsLeft > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut", url: `${publicUrl()}/events/${e.id}` },
   }));
 
   return (

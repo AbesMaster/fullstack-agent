@@ -8,6 +8,7 @@ import { getEvent, seatsTaken } from "@/lib/programme/events";
 import { formatInZone } from "@/lib/booking/time";
 import { formatMoney } from "@/lib/util";
 import { SITE } from "@/lib/site";
+import { publicUrl } from "@/lib/config/env";
 
 export const dynamic = "force-dynamic";
 
@@ -39,9 +40,9 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     startDate: ev.startsAt.toISOString(),
     endDate: ev.endsAt.toISOString(),
     eventStatus: "https://schema.org/EventScheduled",
-    location: ev.isOnline ? { "@type": "VirtualLocation", url: `${SITE.url}/events/${ev.id}` } : { "@type": "Place", name: ev.location },
+    location: ev.isOnline ? { "@type": "VirtualLocation", url: `${publicUrl()}/events/${ev.id}` } : { "@type": "Place", name: ev.location },
     eventAttendanceMode: ev.isOnline ? "https://schema.org/OnlineEventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
-    organizer: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    organizer: { "@type": "Organization", name: SITE.name, url: publicUrl() },
     offers: { "@type": "Offer", price: (ev.priceMinor / 100).toFixed(2), priceCurrency: "GBP", availability: seatsLeft > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut" },
   };
   return (

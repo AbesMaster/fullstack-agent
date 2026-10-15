@@ -10,7 +10,7 @@
 ## Recommended managed services (low fixed overhead)
 - App: Vercel or Render (Node 20+). Worker: Render background worker, or a cron hitting `POST /api/cron/drain` with `Authorization: Bearer $CRON_SECRET` every minute, plus a 5-minute job running `runDueJobs` (or run `npm run worker`).
 - Database: Neon or Supabase Postgres with `pgvector`.
-- Email: Resend with SPF/DKIM/DMARC on metamastermindz.com.
+- Email: Resend with SPF/DKIM/DMARC on the domain used for `APP_URL` (a subdomain such as felicia.metamastermindz.com, or her own domain).
 
 ## Steps (staging first)
 The quickest route is the Render blueprint (`render.yaml` at the repository root); `docs/GO_LIVE.md` walks through it. Before any deploy, run `npm run preflight -- --verify`.

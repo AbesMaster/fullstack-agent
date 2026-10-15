@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { SITE } from "@/lib/site";
+import { publicUrl } from "@/lib/config/env";
 import goldenHaloPortrait from "@/assets/felicia/golden-halo-portrait.jpg";
 import { CtaButton, MissingAsset, Section } from "@/components/ui";
 import { ServiceCard } from "@/components/ServiceCard";
@@ -20,7 +21,7 @@ export default async function Home() {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     name: SITE.name,
-    url: SITE.url,
+    url: publicUrl(),
     founder: { "@type": "Person", name: SITE.owner },
     areaServed: ["GB", "Worldwide (online)"],
     slogan: SITE.philosophy,

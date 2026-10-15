@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SITE } from "@/lib/site";
+import { publicUrl } from "@/lib/config/env";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE.url),
+  metadataBase: new URL(publicUrl()),
   title: { default: `${SITE.name} — Felicia Stefan | Spiritual Wellness & Personal Development`, template: `%s | ${SITE.name}` },
   description: SITE.heroSub,
   openGraph: {

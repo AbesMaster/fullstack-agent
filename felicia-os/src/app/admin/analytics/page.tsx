@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { publicUrl } from "@/lib/config/env";
 import { db, requirePageUser } from "@/lib/server";
 import { funnelReport, rangeEndingToday, websiteReport, RETENTION_DAYS } from "@/lib/analytics/analytics";
 import { Card, Stat } from "@/components/admin/Stat";
@@ -147,7 +148,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
 
       <Card title="Tracking your campaigns">
         <p className="text-sm text-navy-800/80">Add tags to links you share so this page can tell which posts and emails bring people in. For example, in your Instagram bio use:</p>
-        <code className="mt-2 block overflow-x-auto rounded-lg bg-ivory p-3 text-xs">https://metamastermindz.com/?utm_source=instagram&amp;utm_medium=social&amp;utm_campaign=bio</code>
+        <code className="mt-2 block overflow-x-auto rounded-lg bg-ivory p-3 text-xs">{publicUrl()}/?utm_source=instagram&amp;utm_medium=social&amp;utm_campaign=bio</code>
         <p className="mt-3 text-xs text-navy-800/60">Raw visit records are kept for {Math.round(RETENTION_DAYS / 30)} months, then deleted automatically.</p>
       </Card>
     </div>
