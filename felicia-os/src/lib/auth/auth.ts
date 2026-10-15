@@ -11,6 +11,13 @@ import { newId, normaliseEmail } from "../util";
 
 const scrypt = promisify(_scrypt) as (pw: string, salt: Buffer, len: number) => Promise<Buffer>;
 
+/**
+ * Authenticator codes change every 30 seconds. Accept the adjacent window either side
+ * (RFC 6238's recommended allowance) so a code typed just before it rolls over, or with
+ * slight clock drift between phone and server, still works.
+ */
+const totp = authenticator.clone({ window: 1 });
+
 export type Role = "owner" | "admin" | "staff" | "viewer";
 export type SessionUser = { id: string; email: string; name: string; role: Role };
 
@@ -101,7 +108,7 @@ export const mfaRequired = (role: Role) => role === "owner" || role === "admin";
 
 const attempts = new Map<string, { n: number; until: number }>();
 
-export async function login(db: DB, email: string, password: string, totp?: string) {
+export async function login(db: DB, email: string, password: string, code?: string) {
   const key = normaliseEmail(email);
   const lock = attempts.get(key);
   if (lock && lock.until > Date.now()) return { ok: false as const, error: "Too many attempts. Try again in 15 minutes." };
@@ -115,7 +122,7 @@ export async function login(db: DB, email: string, password: string, totp?: stri
   }
   if (mfaRequired(u.role) || u.mfaEnabled) {
     if (!u.mfaEnabled || !u.totpSecret) return { ok: false as const, error: "MFA enrolment is required for this account. Run scripts/create-admin to enrol." };
-    if (!totp || !authenticator.check(totp, u.totpSecret)) return { ok: false as const, error: "Enter the 6-digit code from your authenticator app.", needsTotp: true };
+    if (!code || !totp.check(code, u.totpSecret)) return { ok: false as const, error: "Enter the 6-digit code from your authenticator app.", needsTotp: true };
   }
   attempts.delete(key);
   await audit(db, { actor: `user:${u.id}`, action: "auth.login" });

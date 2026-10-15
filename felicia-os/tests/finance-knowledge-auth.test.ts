@@ -108,3 +108,21 @@ describe("authentication and permissions", () => {
     await expect(updateService(h.db, "signature-private-session", { priceMinor: 100, priceMaxMinor: 50 }, "user:owner")).rejects.toThrow();
   });
 });
+
+describe("authenticator code timing", () => {
+  it("accepts a code typed just before the 30-second window rolls over", async () => {
+    const { vi } = await import("vitest");
+    const { totpSecret } = await createUser(h.db, { email: "edge@example.test", name: "Edge (fictional)", role: "owner", password: "a-long-test-password" });
+    const boundary = Math.ceil(Date.now() / 30_000) * 30_000 + 30_000;
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      vi.setSystemTime(boundary - 1000); // code shown in the app one second before it changes
+      const code = authenticator.generate(totpSecret!);
+      vi.setSystemTime(boundary + 2000); // server checks it two seconds later, in the next window
+      const r = await login(h.db, "edge@example.test", "a-long-test-password", code);
+      expect(r.ok).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
