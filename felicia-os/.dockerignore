@@ -1,0 +1,7 @@
+node_modules
+.next
+.data
+e2e-artifacts
+test-results
+.env*
+!.env.example
