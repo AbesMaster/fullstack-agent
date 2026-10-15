@@ -54,9 +54,9 @@ describe("launch check (preflight)", () => {
   it("the site can live on any domain, but emails must come from that domain", async () => {
     const sub = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://felicia.metamastermindz.com", EMAIL_FROM: "Felicia <hello@metamastermindz.com>" }) });
     expect(find(sub, "Email", "Sending address")!.result).toBe("pass");
-    const own = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://www.feliciastefan.com", EMAIL_FROM: "Felicia <hello@feliciastefan.com>" }) });
+    const own = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://www.feliciastefanhealing.com", EMAIL_FROM: "Felicia <hello@feliciastefanhealing.com>" }) });
     expect(find(own, "Email", "Sending address")!.result).toBe("pass");
-    const mismatch = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://feliciastefan.com", EMAIL_FROM: "Felicia <hello@metamastermindz.com>" }) });
+    const mismatch = await runPreflight(h.db, { env: prodEnv({ APP_URL: "https://feliciastefanhealing.com", EMAIL_FROM: "Felicia <hello@metamastermindz.com>" }) });
     expect(find(mismatch, "Email", "Sending address")!.result).toBe("fail");
   });
 
@@ -125,6 +125,6 @@ describe("production never fakes Zoom links or emails", () => {
 
 describe("site address", () => {
   it("comes from APP_URL, without a trailing slash", () => {
-    expect(publicUrl({ APP_URL: "https://feliciastefan.com/" } as Env)).toBe("https://feliciastefan.com");
+    expect(publicUrl({ APP_URL: "https://feliciastefanhealing.com/" } as Env)).toBe("https://feliciastefanhealing.com");
   });
 });

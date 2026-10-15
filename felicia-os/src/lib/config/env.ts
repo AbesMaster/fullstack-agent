@@ -29,7 +29,7 @@ const EnvSchema = z.object({
   GOOGLE_SERVICE_ACCOUNT_JSON: z.string().optional(),
 
   EMAIL_PROVIDER_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().default("Felicia Stefan <hello@feliciastefan.com>"),
+  EMAIL_FROM: z.string().default("Felicia Stefan <hello@feliciastefanhealing.com>"),
 
   // Zoom Server-to-Server OAuth app (Zoom Marketplace → Develop → Build App → Server-to-Server OAuth)
   ZOOM_ACCOUNT_ID: z.string().optional(),

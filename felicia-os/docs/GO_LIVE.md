@@ -6,28 +6,25 @@ The rule throughout: **rehearse first, then launch.** The site starts as *stagin
 
 ## 1. Decisions (Felicia, free)
 - [ ] Approve or change the ten prices (Command Center → Services; setting a service to **Active** approves its price).
-- [x] Choose the web address: **feliciastefan.com** (decided 15 October 2026). Public email: `hello@feliciastefan.com` unless Felicia prefers another.
-- [x] Buy feliciastefan.com (bought 15 October 2026; registered to and managed by the MetaMasterMindz owner, who handles its DNS settings and renewal). Next: connect it once Render is set up (step 3.7).
+- [x] Web address: **feliciastefanhealing.com**, bought at Cloudflare on 15 October 2026 and managed by the MetaMasterMindz owner. Public email: `hello@feliciastefanhealing.com` unless Felicia prefers another.
 - [ ] Book a UK solicitor to review the Privacy, Terms and Cancellation pages. Every gap is marked **[CONFIRM]**.
 
-## Choosing the address
-metamastermindz.com is the owner's own site, so Felicia's site lives separately and nothing on the main site changes. Two options, and the system works the same with either (the address is one setting, `APP_URL`):
+## The web address: feliciastefanhealing.com (Cloudflare)
+Felicia's site lives on its own domain, separate from metamastermindz.com, so nothing on the main site changes. Everything (links, emails, search listings) uses the one `APP_URL` setting.
 
-- **A subdomain, e.g. `felicia.metamastermindz.com`.** No cost and ready in minutes: the domain owner adds one DNS record (a CNAME pointing at Render). Emails can be sent from `hello@felicia.metamastermindz.com`, verified separately in Resend, so the main domain's email is untouched.
-- **Her own domain, e.g. `feliciastefan.com`** (available on 15 October 2026, about $16 for the first year). Best for her own brand, search results and moving it independently later. Buy it at any registrar (or the one already used for metamastermindz.com) in Felicia's name.
+Once Render is set up (step 3), in **Cloudflare → feliciastefanhealing.com → DNS → Records**:
+1. Add the records Render shows under **Settings → Custom Domains** for `feliciastefanhealing.com` and `www.feliciastefanhealing.com`: usually a `CNAME` for `@` and one for `www`, both pointing at the site's `….onrender.com` address. Cloudflare allows a CNAME on `@` (it "flattens" it automatically).
+2. Set both to **DNS only** (grey cloud), not Proxied, so Render can issue the site's security certificate. Wait until Render shows them as Verified.
+3. Add the email records Resend shows (for sending) the same way, also DNS only.
+4. **Receiving email:** Resend only sends. To get replies to `hello@feliciastefanhealing.com`, turn on **Cloudflare Email Routing** (free) and forward `hello@` to Felicia's own inbox.
 
-Starting on a subdomain and moving to her own domain later is fine: change `APP_URL` and `EMAIL_FROM`, then redirect the old address.
-
-### Buying the domain (decided: feliciastefan.com)
-1. At any registrar (Cloudflare Registrar, Namecheap, Porkbun, or the one already used for metamastermindz.com), search for `feliciastefan.com` and buy it for 1 year or more. Turn on auto-renew and the free privacy (WHOIS) protection.
-2. Register it in **Felicia's name and email** (or the business's), so she owns it outright.
-3. Don't buy add-ons such as hosting, website builders or paid email: Render hosts the site and Resend sends the email.
-4. Once Render is set up, add the two records it shows (for `feliciastefan.com` and `www.feliciastefan.com`) in the registrar's DNS settings, plus the email records Resend shows.
+### The earlier domain, feliciastefan.com
+It was bought through Shopify and became the main address of the MetaMasterMindz merch store. In Shopify **Settings → Domains → Change primary domain**, set the store back to its previous address. Later you can either let feliciastefan.com expire, or (after its 60-day transfer lock, around 14 December 2026) point it at Felicia's site so both addresses work.
 
 ## 2. Accounts (Felicia opens them, in her business's name)
 | Account | What it's for | Needed to launch? | Cost |
 |---|---|---|---|
-| **Domain** (see below) | The website address and email sending | Yes | Subdomain: no cost. Own domain: ~$16/year |
+| **Domain**: feliciastefanhealing.com | The website address and email | Bought ✓ (Cloudflare) | Renews at cost, about $10/year |
 | **Render** (render.com) | Hosts the website, background worker and database | Yes | ≈ $20/month |
 | **Stripe** (stripe.com) | Card payments | Yes | 1.5% + 20p per UK card, no monthly fee |
 | **Resend** (resend.com) | Booking confirmations, sign-in links, receipts | Yes | Free up to 3,000 emails/month |
@@ -44,7 +41,7 @@ Starting on a subdomain and moving to her own domain later is fine: change `APP_
    `ADMIN_PASSWORD='…' npx tsx scripts/create-admin.mts felicia@… "Felicia Stefan" owner` and scan the code into an authenticator app.
 5. In Stripe (test mode) add a webhook to `https://<your-site>/api/webhooks/payments` for `checkout.session.completed`, `checkout.session.async_payment_failed`, `checkout.session.expired` and `charge.refunded`. Paste its signing secret into Render.
 6. In Resend, add the domain and put the DNS records it shows into the domain's settings.
-7. Point the address at Render (Render → Settings → Custom Domains shows the DNS record to add), then set `APP_URL` to `https://feliciastefan.com` and `EMAIL_FROM` to `Felicia Stefan <hello@feliciastefan.com>`.
+7. Point the address at Render (Render → Settings → Custom Domains shows the DNS record to add), then set `APP_URL` to `https://feliciastefanhealing.com` and `EMAIL_FROM` to `Felicia Stefan <hello@feliciastefanhealing.com>`.
 
 ## 4. Launch check
 In the Render shell for the website:
