@@ -159,6 +159,12 @@ export const bookings = pgTable(
     amountMinor: integer("amount_minor").notNull(),
     currency: text("currency").notNull().default("GBP"),
     calendarEventId: text("calendar_event_id"),
+    /** online | in_person. Fixed by the service, or chosen by the client for hybrid services. */
+    attendanceMode: text("attendance_mode").notNull().default("online"),
+    /** Video meeting for online sessions. The host start link is never stored (Felicia starts meetings from her Zoom app). */
+    videoMeetingId: text("video_meeting_id"),
+    videoJoinUrl: text("video_join_url"),
+    videoPasscode: text("video_passcode"),
     idempotencyKey: text("idempotency_key").notNull(),
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     createdAt: createdAt(),
@@ -215,6 +221,10 @@ export const programmeEvents = pgTable("programme_events", {
   title: text("title").notNull(),
   description: text("description").notNull().default(""),
   includesBreathwork: boolean("includes_breathwork").notNull().default(false),
+  isOnline: boolean("is_online").notNull().default(false),
+  videoMeetingId: text("video_meeting_id"),
+  videoJoinUrl: text("video_join_url"),
+  videoPasscode: text("video_passcode"),
   serviceId: text("service_id").references(() => services.id),
   startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
   endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),

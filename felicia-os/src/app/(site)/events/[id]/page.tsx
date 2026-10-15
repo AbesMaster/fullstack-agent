@@ -38,7 +38,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     startDate: ev.startsAt.toISOString(),
     endDate: ev.endsAt.toISOString(),
     eventStatus: "https://schema.org/EventScheduled",
-    location: { "@type": "Place", name: ev.location },
+    location: ev.isOnline ? { "@type": "VirtualLocation", url: `${SITE.url}/events/${ev.id}` } : { "@type": "Place", name: ev.location },
+    eventAttendanceMode: ev.isOnline ? "https://schema.org/OnlineEventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
     organizer: { "@type": "Organization", name: SITE.name, url: SITE.url },
     offers: { "@type": "Offer", price: (ev.priceMinor / 100).toFixed(2), priceCurrency: "GBP", availability: seatsLeft > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut" },
   };
@@ -55,7 +56,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <div className="space-y-6 lg:col-span-3">
             <dl className="grid gap-4 rounded-3xl bg-white p-6 sm:grid-cols-3">
               <div><dt className="text-xs uppercase tracking-wider text-navy-800/60">When</dt><dd className="mt-1 text-sm">{formatInZone(ev.startsAt, "Europe/London")}<br /><span className="text-navy-800/70">{hours} hours</span></dd></div>
-              <div><dt className="text-xs uppercase tracking-wider text-navy-800/60">Where</dt><dd className="mt-1 text-sm">{ev.location}</dd></div>
+              <div><dt className="text-xs uppercase tracking-wider text-navy-800/60">Where</dt><dd className="mt-1 text-sm">{ev.location}</dd>{ev.isOnline && <dd className="text-xs text-navy-800/60">Online via Zoom. Your link arrives with your confirmation.</dd>}</div>
               <div><dt className="text-xs uppercase tracking-wider text-navy-800/60">Investment</dt><dd className="mt-1 font-display text-2xl">{ev.priceMinor === 0 ? "Free" : formatMoney(ev.priceMinor)}</dd><dd className="text-xs text-navy-800/60">per person</dd></div>
             </dl>
             {ev.description ? <div className="whitespace-pre-line leading-relaxed text-navy-800">{ev.description}</div> : <p className="text-navy-800/70">Full details for this event will be shared soon.</p>}

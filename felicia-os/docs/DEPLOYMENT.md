@@ -17,8 +17,9 @@
 2. Set every variable in `.env.example` (generate secrets with `openssl rand -base64 48` / `-base64 32`). Store them in the host's secret manager, never in Git.
 3. `ADMIN_PASSWORD=… npx tsx scripts/create-admin.mts felicia@… "Felicia Stefan" owner`. Scan the printed otpauth URL into an authenticator.
 4. Stripe: add a webhook endpoint `https://<host>/api/webhooks/payments` for `checkout.session.completed`, `checkout.session.async_payment_failed`, `checkout.session.expired` and `charge.refunded`.
-5. Deploy, then run the smoke checks: `/api/health`, book a discovery call, complete a Stripe **test-card** payment, confirm the booking shows as confirmed and the emails arrive.
-6. Record the deployed version (git SHA) and the result in the deployment log.
+5. Zoom: in the Zoom App Marketplace create a **Server-to-Server OAuth** app on Felicia's account, add the three meeting scopes listed in `.env.example`, activate it, and set `ZOOM_ACCOUNT_ID`, `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET` (and `ZOOM_HOST_USER` if the app owner isn't the host). A Pro licence avoids the 40-minute limit on free meetings.
+6. Deploy, then run the smoke checks: `/api/health`, book a discovery call, complete a Stripe **test-card** payment, confirm the booking shows as confirmed and the emails arrive.
+7. Record the deployed version (git SHA) and the result in the deployment log.
 
 ## CI
 `.github/workflows/felicia-os.yml` runs typecheck, unit/integration tests, the production build and E2E tests on every push and PR touching `felicia-os/`.

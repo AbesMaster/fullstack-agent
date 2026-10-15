@@ -4,7 +4,8 @@ import { agentTasks, bookings, contacts, emailLog, enquiries, eventRegistrations
 import { expireRegistrationHolds } from "../programme/events";
 import { purgeOldAnalytics } from "../analytics/analytics";
 import { recordTask, isEmergencyStopped, listPendingApprovals } from "./controls";
-import { ownerAttentionItems } from "./workflows";
+import { bookingPlaceInfo, eventEmailVars, ownerAttentionItems } from "./workflows";
+import { ensureBookingMeeting } from "../video/meetings";
 import { sendTemplate } from "../email/send";
 import { budgetAlerts, forecast, monthOf, monthlyActuals, scenarioAssumptions, REVENUE_TARGETS_MINOR } from "../finance/finance";
 import { publish } from "../events/bus";
@@ -61,7 +62,9 @@ export async function sendReminders(db: DB, now = new Date()) {
   for (const { b, s, c } of due) {
     const [prior] = await db.select().from(emailLog).where(and(eq(emailLog.template, "appointment_reminder"), eq(emailLog.correlationId, `reminder:${b.id}`)));
     if (prior) continue;
-    await sendTemplate(db, "appointment_reminder", c.email, { name: c.name, service: s.name, when: formatInZone(b.startsAt, b.clientTimezone) }, `reminder:${b.id}`);
+    // Online sessions should always have a link by now; create one if an earlier attempt failed.
+    const fresh = b.attendanceMode === "online" && !b.videoJoinUrl ? ((await ensureBookingMeeting(db, b.id)) ?? b) : b;
+    await sendTemplate(db, "appointment_reminder", c.email, { name: c.name, service: s.name, when: formatInZone(b.startsAt, b.clientTimezone), joinInfo: bookingPlaceInfo(fresh) }, `reminder:${b.id}`);
     sent++;
   }
   return { sent };
@@ -115,7 +118,8 @@ export async function sendEventReminders(db: DB, now = new Date()) {
   for (const { r, ev, c } of due) {
     const [prior] = await db.select().from(emailLog).where(eq(emailLog.correlationId, `event-reminder:${r.id}`));
     if (prior) continue;
-    await sendTemplate(db, "event_reminder", c.email, { name: c.name, event: ev.title, when: formatInZone(ev.startsAt, "Europe/London"), logistics: `Location: ${ev.location}.` }, `event-reminder:${r.id}`);
+    const vars = await eventEmailVars(db, c.name, ev);
+    await sendTemplate(db, "event_reminder", c.email, { name: c.name, event: ev.title, when: vars.when, logistics: ev.isOnline ? `\n\n${vars.joinInfo}` : `Location: ${ev.location}.` }, `event-reminder:${r.id}`);
     sent++;
   }
   return { sent };

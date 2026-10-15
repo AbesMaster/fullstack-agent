@@ -21,6 +21,9 @@ Every price starts as **proposed** ("pricing being finalised" shows on the site)
 ## Enquiries & bookings
 See every enquiry, what the person is interested in, and whether they agreed to marketing emails. In the bookings table, "review needed" means the welcome form flagged something for you. Only you (the owner) can open those answers, and each time you do it's recorded.
 
+## Zoom
+Online sessions get their own Zoom meeting automatically, and the link goes into the client's confirmation, reminder and reschedule emails. Online events share one meeting for everyone who registers (tick **Online event** when creating it). Start meetings from your own Zoom app as usual: the waiting room is on, so you let each person in, and nothing is recorded. If a session moves, its Zoom meeting moves too; if it's cancelled, the meeting is deleted. For services offered both ways, clients choose online or in person when they book, and the bookings list shows which.
+
 ## Events & workshops
 Create an event under **Events**. Start it as **Planning** while you prepare (visitors can't see it), then set it to **Open** to publish its page and take registrations. Free events confirm straight away; paid places are held for 30 minutes while the person pays, and are confirmed when the payment arrives. The event switches to **Full** on its own when places run out, and back to **Open** if someone cancels. Tick **Includes breathwork** to add a health notice and a required acknowledgment. Each event has a readiness checklist and a list of who's coming. Cancelling a paid place doesn't refund it automatically: request the refund separately so it goes through approvals. Dates are always entered in UK time.
 

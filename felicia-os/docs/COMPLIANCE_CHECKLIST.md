@@ -7,7 +7,7 @@ This is research and risk-flagging, **not legal advice**. Each item needs confir
 - [ ] Lawful bases confirmed (contract for bookings; explicit consent for health screening; consent for marketing)
 - [ ] Special category data: Article 9 condition (explicit consent) and an appropriate policy document
 - [ ] DPIA for processing health data and using AI tools (recommended)
-- [ ] Data processing agreements with Stripe, HubSpot, Google, Resend, Anthropic and the host; international transfer safeguards
+- [ ] Data processing agreements with Stripe, HubSpot, Google, Zoom, Resend, Anthropic and the host; international transfer safeguards
 - [ ] Retention schedule decided; deletion process for subject requests
 - Built-in: data minimisation in CRM, encrypted intake, owner-only access, audit trail of intake reads
 

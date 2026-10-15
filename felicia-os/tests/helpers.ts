@@ -6,6 +6,7 @@ import { MockPaymentProvider, setPaymentProviderForTests } from "@/lib/payments/
 import { MockCrmProvider, setCrmProviderForTests } from "@/lib/crm/provider";
 import { MockCalendarProvider, setCalendarProviderForTests } from "@/lib/calendar/provider";
 import { MockTransport, setEmailTransportForTests } from "@/lib/email/send";
+import { MockVideoProvider, setVideoProviderForTests } from "@/lib/video/provider";
 import { buildBus } from "@/lib/agents/workflows";
 import { services } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -28,6 +29,8 @@ export async function harness() {
   const crm = new MockCrmProvider();
   const calendar = new MockCalendarProvider();
   const email = new MockTransport();
+  const video = new MockVideoProvider();
+  setVideoProviderForTests(video);
   setPaymentProviderForTests(payments);
   setCrmProviderForTests(crm);
   setCalendarProviderForTests(calendar);
@@ -42,7 +45,7 @@ export async function harness() {
     }
     return total;
   };
-  return { db, payments, crm, calendar, email, bus, drainAll };
+  return { db, payments, crm, calendar, email, video, bus, drainAll };
 }
 
 /** A Monday 08:00 UTC in winter (no DST) — deterministic "now" for availability tests. */

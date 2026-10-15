@@ -8,6 +8,7 @@ import { publish } from "../events/bus";
 import { audit } from "../audit/audit";
 import { env } from "../config/env";
 import { newId, normaliseEmail } from "../util";
+import { syncEventMeeting } from "../video/meetings";
 
 /**
  * Workshops, group experiences and Return to Wonder: self-service registration.
@@ -74,6 +75,7 @@ export const EventInputSchema = z
     priceMinor: z.number().int().min(0).max(10_000_000),
     budgetMinor: z.number().int().min(0).max(100_000_000).default(0),
     includesBreathwork: z.boolean().default(false),
+    isOnline: z.boolean().default(false),
     status: z.enum(EVENT_STATUSES).default("planning"),
   })
   .refine((e) => e.endsAt > e.startsAt, { message: "The event must end after it starts", path: ["endsAt"] });
@@ -104,6 +106,7 @@ export const EventPatchSchema = z
     priceMinor: z.number().int().min(0).max(10_000_000),
     budgetMinor: z.number().int().min(0).max(100_000_000),
     includesBreathwork: z.boolean(),
+    isOnline: z.boolean(),
     status: z.enum(EVENT_STATUSES),
     checklist: z.array(z.object({ item: z.string().min(1).max(200), done: z.boolean() })).max(40),
   })
@@ -125,6 +128,11 @@ export async function updateEvent(db: DB, id: string, patch: z.input<typeof Even
   await db.update(programmeEvents).set(p).where(eq(programmeEvents.id, id));
   await audit(db, { actor, action: "event.updated", target: id, metadata: { fields: Object.keys(p), status: p.status } });
   if (p.capacity !== undefined || p.status === "open") await refreshEventStatus(db, id);
+  // Keep the shared Zoom meeting in step: new time/title, or delete it if cancelled or no longer online.
+  if (["startsAt", "endsAt", "title", "status", "isOnline"].some((k) => k in p)) {
+    const sync = await syncEventMeeting(db, id, actor);
+    if (!sync.ok) return { ...(await getEvent(db, id))!, videoWarning: sync.message };
+  }
   return getEvent(db, id);
 }
 

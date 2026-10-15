@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-type Initial = { id: string; title: string; description: string; location: string; startsAt: string; endsAt: string; capacity: number; priceMinor: number; budgetMinor: number; includesBreathwork: boolean; status: string };
+type Initial = { id: string; title: string; description: string; location: string; startsAt: string; endsAt: string; capacity: number; priceMinor: number; budgetMinor: number; includesBreathwork: boolean; isOnline: boolean; status: string };
 
 async function post(body: unknown) {
   const r = await fetch("/api/admin/events", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -25,11 +25,13 @@ export function EventEditor({ mode, initial }: { mode: "create" | "edit"; initia
       priceMinor: Math.round(Number(f.get("price")) * 100),
       budgetMinor: Math.round(Number(f.get("budget") || 0) * 100),
       includesBreathwork: f.get("breathwork") === "on",
+      isOnline: f.get("online") === "on",
       status: f.get("status"),
     };
     setMsg("Saving…");
     const { ok, j } = mode === "create" ? await post({ action: "create", event: values }) : await post({ action: "update", id: initial!.id, patch: values });
     if (!ok) return setMsg(j.issues?.[0]?.message ?? j.error ?? "Please check the fields");
+    if (j.event?.videoWarning) return setMsg(`Saved, but Zoom wasn't updated: ${j.event.videoWarning}. Check the meeting in Zoom.`);
     if (mode === "create") window.location.href = `/admin/events/${j.id}`;
     else {
       setMsg("Saved");
@@ -59,6 +61,7 @@ export function EventEditor({ mode, initial }: { mode: "create" | "edit"; initia
           <option value="cancelled">Cancelled</option>
         </select>
       </label>
+      <label className="flex items-center gap-2 text-sm md:col-span-2"><input id={`${p}-online`} type="checkbox" name="online" defaultChecked={v?.isOnline} /> Online event (a Zoom link is created and emailed to everyone who registers)</label>
       <label className="flex items-center gap-2 text-sm md:col-span-2"><input id={`${p}-breathwork`} type="checkbox" name="breathwork" defaultChecked={v?.includesBreathwork} /> Includes breathwork (adds a health notice and a required acknowledgment)</label>
       <div className="md:col-span-2"><button className="rounded-full bg-navy-900 px-4 py-2 text-sm text-ivory">{mode === "create" ? "Create event" : "Save changes"}</button> <span role="status" className="ml-2 text-sm">{msg}</span></div>
     </form>

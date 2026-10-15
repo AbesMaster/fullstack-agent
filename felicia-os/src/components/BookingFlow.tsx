@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
 
-type Svc = { id: string; name: string; priceMinor: number; durationMinutes: number; requiresDiscoveryCall: boolean; capacity: number; approved: boolean };
+type Svc = { id: string; name: string; priceMinor: number; durationMinutes: number; requiresDiscoveryCall: boolean; capacity: number; approved: boolean; deliveryMode: "online" | "in_person" | "hybrid" };
 
 const money = (m: number) => (m === 0 ? "Complimentary" : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(m / 100));
 
@@ -13,6 +13,7 @@ export function BookingFlow({ services, initialService }: { services: Svc[]; ini
   const [state, setState] = useState<"idle" | "loading" | "submitting" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
   const [key, setKey] = useState(() => crypto.randomUUID());
+  const [mode, setMode] = useState<"online" | "in_person">("online");
   const tz = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
   const svc = services.find((s) => s.id === serviceId)!;
 
@@ -46,7 +47,7 @@ export function BookingFlow({ services, initialService }: { services: Svc[]; ini
     const res = await fetch("/api/bookings", {
       method: "POST",
       headers: { "content-type": "application/json", "idempotency-key": key },
-      body: JSON.stringify({ serviceId, startsAt: slot, name: f.get("name"), email: f.get("email"), phone: f.get("phone") || undefined, clientTimezone: tz, marketingConsent: f.get("consent") === "on", acceptedTerms: f.get("terms") === "on" }),
+      body: JSON.stringify({ serviceId, startsAt: slot, name: f.get("name"), email: f.get("email"), phone: f.get("phone") || undefined, clientTimezone: tz, marketingConsent: f.get("consent") === "on", acceptedTerms: f.get("terms") === "on", attendanceMode: svc.deliveryMode === "hybrid" ? mode : undefined }),
     });
     const j = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -84,6 +85,17 @@ export function BookingFlow({ services, initialService }: { services: Svc[]; ini
             {services.map((s) => <option key={s.id} value={s.id}>{s.name} — {money(s.priceMinor)}</option>)}
           </select>
         </label>
+        {svc.deliveryMode === "hybrid" ? (
+          <fieldset className="rounded-xl bg-white p-4">
+            <legend className="px-1 text-sm font-medium">How would you like to meet?</legend>
+            <div className="mt-2 flex flex-wrap gap-4 text-sm">
+              <label className="flex items-center gap-2"><input id="mode-online" type="radio" name="attendanceMode" checked={mode === "online"} onChange={() => setMode("online")} /> Online (Zoom link sent by email)</label>
+              <label className="flex items-center gap-2"><input id="mode-in-person" type="radio" name="attendanceMode" checked={mode === "in_person"} onChange={() => setMode("in_person")} /> In person (UK)</label>
+            </div>
+          </fieldset>
+        ) : (
+          <p className="text-sm text-navy-800/70">{svc.deliveryMode === "online" ? "Online by Zoom. Your link arrives with your confirmation." : "In person. Felicia will email you the venue details."}</p>
+        )}
         {svc.requiresDiscoveryCall && <p className="rounded-xl bg-lavender/15 p-4 text-sm">This experience begins with a complimentary discovery call. If you haven't had one yet, please book that first.</p>}
         {!svc.approved && svc.priceMinor > 0 && <p className="text-xs text-earth">Pricing is being finalised; the price shown at checkout is what you'll pay.</p>}
         <fieldset>

@@ -29,6 +29,13 @@
       "when": 1792025409577,
       "tag": "0003_analytics",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792026042459,
+      "tag": "0004_zoom",
+      "breakpoints": true
     }
   ]
 }

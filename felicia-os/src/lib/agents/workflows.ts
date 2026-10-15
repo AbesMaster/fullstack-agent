@@ -8,6 +8,8 @@ import { calendarProvider } from "../calendar/provider";
 import { paymentProvider } from "../payments/provider";
 import { sendMarketingContent, sendTemplate } from "../email/send";
 import { confirmPaidBooking } from "../payments/processing";
+import { deleteBookingMeeting, ensureBookingMeeting, ensureEventMeeting, moveBookingMeeting } from "../video/meetings";
+import { joinInstructions, VideoError } from "../video/provider";
 import { confirmRegistrationAfterPayment } from "../programme/events";
 import { escalationReason } from "../compliance/claims";
 import { formatInZone } from "../booking/time";
@@ -38,6 +40,11 @@ async function contactFor(db: DB, contactId: string) {
   return c;
 }
 
+/** Calendar entries are Felicia's own; they carry the join link but never client details beyond a first name. */
+function calendarDescription(b: typeof bookings.$inferSelect) {
+  return [`Booking ${b.id}`, b.attendanceMode === "in_person" ? "In person" : b.videoJoinUrl ? `Zoom: ${b.videoJoinUrl}` : "Online"].join("\n");
+}
+
 async function bookingContext(db: DB, bookingId: string) {
   const [b] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
   if (!b) throw new Error(`Booking ${bookingId} missing`);
@@ -46,8 +53,22 @@ async function bookingContext(db: DB, bookingId: string) {
   return { b, s: s!, c, when: formatInZone(b.startsAt, b.clientTimezone) };
 }
 
+/** How the client joins: a Zoom link for online sessions, a note for in-person ones. */
+export function bookingPlaceInfo(b: typeof bookings.$inferSelect) {
+  if (b.attendanceMode === "in_person") return "This session is in person. Felicia will email you the venue address and directions before the day.";
+  if (!b.videoJoinUrl) throw new VideoError("The video link for this session isn't ready yet; will retry", true);
+  return joinInstructions(b);
+}
+
+/** Email variables for event registrants; creates the shared Zoom meeting first for online events. */
+export async function eventEmailVars(db: DB, name: string, ev: typeof programmeEvents.$inferSelect) {
+  const withMeeting = ev.isOnline ? ((await ensureEventMeeting(db, ev.id)) ?? ev) : ev;
+  return registrationEmailVars(name, withMeeting);
+}
+
 export function registrationEmailVars(name: string, ev: typeof programmeEvents.$inferSelect) {
   return {
+    joinInfo: ev.isOnline ? joinInstructions(ev) : "",
     name,
     event: ev.title,
     when: formatInZone(ev.startsAt, "Europe/London"),
@@ -132,6 +153,18 @@ export function buildBus(): EventBus {
 
   /* ---------------- Bookings ---------------- */
 
+  // Runs first so the calendar entry and confirmation email can include the join link.
+  bus.register({
+    name: "video.booking_meeting",
+    agentId: "scheduling",
+    on: "BOOKING_CONFIRMED",
+    run: (db, e) =>
+      recordTask(db, "scheduling", "create_video_meeting", e.correlationId, e.payload, async () => {
+        const b = await ensureBookingMeeting(db, e.payload.bookingId);
+        return b ? { meeting: b.videoMeetingId } : "not_online";
+      }),
+  });
+
   bus.register({
     name: "scheduling.calendar_event",
     agentId: "scheduling",
@@ -142,7 +175,7 @@ export function buildBus(): EventBus {
         const { b, s, c } = await bookingContext(db, e.payload.bookingId);
         if (b.calendarEventId) return { eventId: b.calendarEventId };
         // Minimum data in calendar: service + first name + booking id. No intake/health info.
-        const r = await calendarProvider().createEvent({ summary: `${s.name} — ${c.name.split(" ")[0]}`, start: b.startsAt, end: b.endsAt, description: `Booking ${b.id}`, idempotencyKey: b.id });
+        const r = await calendarProvider().createEvent({ summary: `${s.name} — ${c.name.split(" ")[0]}`, start: b.startsAt, end: b.endsAt, description: calendarDescription(b), idempotencyKey: b.id });
         await db.update(bookings).set({ calendarEventId: r.eventId }).where(eq(bookings.id, b.id));
         return r;
       }),
@@ -155,9 +188,10 @@ export function buildBus(): EventBus {
     run: (db, e) =>
       recordTask(db, "client-experience", "booking_confirmation", e.correlationId, e.payload, async () => {
         const { b, s, c, when } = await bookingContext(db, e.payload.bookingId);
-        if (s.id === "discovery-call") return sendTemplate(db, "discovery_booking_confirmation", c.email, { name: c.name, when }, e.correlationId);
+        const joinInfo = bookingPlaceInfo(b);
+        if (s.id === "discovery-call") return sendTemplate(db, "discovery_booking_confirmation", c.email, { name: c.name, when, joinInfo }, e.correlationId);
         const intakeUrl = `${env().APP_URL}/intake?b=${b.id}&t=${signResourceToken("intake", b.id)}`;
-        return sendTemplate(db, "session_preparation", c.email, { name: c.name, service: s.name, when, intakeUrl }, e.correlationId);
+        return sendTemplate(db, "session_preparation", c.email, { name: c.name, service: s.name, when, intakeUrl, joinInfo }, e.correlationId);
       }),
   });
 
@@ -191,17 +225,25 @@ export function buildBus(): EventBus {
   });
 
   bus.register({
+    name: "video.cancel_meeting",
+    agentId: "scheduling",
+    on: "BOOKING_CANCELLED",
+    run: (db, e) => recordTask(db, "scheduling", "delete_video_meeting", e.correlationId, e.payload, () => deleteBookingMeeting(db, e.payload.bookingId)),
+  });
+
+  bus.register({
     name: "scheduling.reschedule",
     agentId: "scheduling",
     on: "BOOKING_RESCHEDULED",
     run: (db, e) =>
       recordTask(db, "scheduling", "reschedule", e.correlationId, e.payload, async () => {
+        await moveBookingMeeting(db, e.payload.bookingId);
         const { b, s, c, when } = await bookingContext(db, e.payload.bookingId);
         if (!b.calendarEventId) {
-          const r = await calendarProvider().createEvent({ summary: `${s.name} — ${c.name.split(" ")[0]}`, start: b.startsAt, end: b.endsAt, description: `Booking ${b.id}`, idempotencyKey: `${b.id}:${b.startsAt.toISOString()}` });
+          const r = await calendarProvider().createEvent({ summary: `${s.name} — ${c.name.split(" ")[0]}`, start: b.startsAt, end: b.endsAt, description: calendarDescription(b), idempotencyKey: `${b.id}:${b.startsAt.toISOString()}` });
           await db.update(bookings).set({ calendarEventId: r.eventId }).where(eq(bookings.id, b.id));
         }
-        return sendTemplate(db, "rescheduling_confirmation", c.email, { name: c.name, service: s.name, when }, e.correlationId);
+        return sendTemplate(db, "rescheduling_confirmation", c.email, { name: c.name, service: s.name, when, joinInfo: bookingPlaceInfo(b) }, e.correlationId);
       }),
   });
 
@@ -237,7 +279,7 @@ export function buildBus(): EventBus {
           const [r] = await db.select().from(eventRegistrations).where(eq(eventRegistrations.id, p.registrationId));
           const [ev] = r ? await db.select().from(programmeEvents).where(eq(programmeEvents.id, r.eventId)) : [];
           const c = r ? await contactFor(db, r.contactId) : undefined;
-          if (c && ev) return sendTemplate(db, "workshop_registration", c.email, registrationEmailVars(c.name, ev), e.correlationId);
+          if (c && ev) return sendTemplate(db, "workshop_registration", c.email, await eventEmailVars(db, c.name, ev), e.correlationId);
         }
         return "skipped";
       }),
@@ -281,7 +323,7 @@ export function buildBus(): EventBus {
         if (!r || r.status !== "confirmed" || r.amountMinor > 0) return "skipped";
         const [ev] = await db.select().from(programmeEvents).where(eq(programmeEvents.id, r.eventId));
         const c = await contactFor(db, r.contactId);
-        return sendTemplate(db, "workshop_registration", c.email, registrationEmailVars(c.name, ev!), e.correlationId);
+        return sendTemplate(db, "workshop_registration", c.email, await eventEmailVars(db, c.name, ev!), e.correlationId);
       }),
   });
 

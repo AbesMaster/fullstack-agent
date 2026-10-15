@@ -12,10 +12,10 @@ _Last updated: 2026-10-14, at the end of the first build session._
 | 02 | Premium responsive website | TESTED | 16 required pages plus booking, intake, feedback and unsubscribe. E2E: every public page renders. Real photos, logo and biography are **BLOCKED** on owner assets |
 | 03 | Admin Command Center | TESTED | Overview, approvals, enquiries/bookings, finance, content, services, knowledge, agents, audit, emergency stop. MFA sign-in tested end-to-end |
 | 04 | Multi-agent orchestration layer | TESTED | 21 agents, tool allow-lists, approval gating, rate limits, task history, emergency stop |
-| 05 | Database schema and migrations | TESTED | Drizzle + PostgreSQL/pgvector; 4 migrations; tested on PGlite. **Not yet run on a managed Postgres** |
+| 05 | Database schema and migrations | TESTED | Drizzle + PostgreSQL/pgvector; 5 migrations; tested on PGlite. **Not yet run on a managed Postgres** |
 | 06 | Knowledge ingestion system | TESTED | PDF/DOCX/TXT/MD/CSV/JSON/approved URLs, versioning, metadata, access levels, pgvector search. The embedder is a local lexical one (see ARCHITECTURE) |
 | 07 | CRM integration (HubSpot) | TESTED (mock) | Real HubSpot client written and tested with a fake HTTP layer. **BLOCKED: no HubSpot token** |
-| 08 | Scheduling integration (Google Calendar) | TESTED (mock) | Availability, buffers, time zones, double-booking prevention, reschedule and cancel. **BLOCKED: no Google service account.** Zoom links not yet implemented |
+| 08 | Scheduling integration (Google Calendar + Zoom) | TESTED (mock) | Availability, buffers, time zones, double-booking prevention, reschedule and cancel. Zoom: a private meeting (waiting room, never recorded) is created for each online session and shared online event; the join link goes in confirmation, reschedule and reminder emails; meetings move with reschedules and are deleted on cancellation; outages retry without sending a link-less confirmation. Clients choose online or in person for hybrid services. **BLOCKED: no Google service account or Zoom app credentials** |
 | 09 | Payment integration (Stripe) | TESTED (mock) | Hosted checkout, signed webhooks, idempotency, approval-gated refunds. **BLOCKED: no Stripe test keys.** PayPal: NOT STARTED |
 | 10 | Email automation | TESTED (mock) | All 13 workflow templates, consent enforcement, one-click unsubscribe, suppression. **BLOCKED: no email provider key or verified sending domain** |
 | 11 | Marketing content management | TESTED | Draft → compliance → approval → publish/manual pack. Social platform APIs: NOT STARTED (manual posting pack used instead) |
@@ -26,7 +26,7 @@ _Last updated: 2026-10-14, at the end of the first build session._
 | 16 | JARVIS integration adapter | TESTED (mock) | Contract, privacy redaction and signed-webhook transport. **BLOCKED: no JARVIS spec** (no endpoints were invented) |
 | 17 | Privacy and security controls | TESTED | RBAC, MFA, scrypt, signed sessions, CSRF origin check, rate limits, security headers, encryption, CRM data guard |
 | 18 | Audit logging | TESTED | Append-only, no sensitive payloads |
-| 19 | Automated tests | TESTED | 69 unit/integration + 7 E2E, all passing |
+| 19 | Automated tests | TESTED | 78 unit/integration + 7 E2E, all passing |
 | 20 | Deployment configuration | IMPLEMENTED | GitHub Actions CI, env template, migration/worker scripts, Dockerfile. **No staging host** |
 | 21 | Administrator documentation | IMPLEMENTED | `docs/ADMIN_GUIDE.md` |
 | 22 | Operating procedures | IMPLEMENTED | `docs/OPERATING_PROCEDURES.md` |
@@ -39,7 +39,7 @@ _Last updated: 2026-10-14, at the end of the first build session._
 1. **Hosting decision and accounts.** A managed PostgreSQL with pgvector (e.g. Neon, Supabase), app hosting (e.g. Vercel or Render) and a separate worker process or scheduler.
 2. **Stripe** account in test mode: `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`.
 3. **HubSpot** private app token.
-4. **Google** service account plus calendar ID. Zoom account if Zoom links are wanted.
+4. **Google** service account plus calendar ID, and a **Zoom** Server-to-Server OAuth app (Pro plan or above, so meetings aren't limited to 40 minutes).
 5. **Resend** (or another provider) API key, plus DNS records (SPF/DKIM/DMARC) for metamastermindz.com.
 6. **Anthropic API key** for the AI drafting and chat. Without it, the chat uses rule-based answers.
 7. **JARVIS OS** API documentation and credentials.

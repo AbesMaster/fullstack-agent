@@ -31,6 +31,12 @@ const EnvSchema = z.object({
   EMAIL_PROVIDER_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default("Felicia at MetaMasterMindz <hello@metamastermindz.com>"),
 
+  // Zoom Server-to-Server OAuth app (Zoom Marketplace → Develop → Build App → Server-to-Server OAuth)
+  ZOOM_ACCOUNT_ID: z.string().optional(),
+  ZOOM_CLIENT_ID: z.string().optional(),
+  ZOOM_CLIENT_SECRET: z.string().optional(),
+  ZOOM_HOST_USER: z.string().default("me"), // the Zoom user (email or id) who hosts meetings
+
   JARVIS_BASE_URL: z.string().url().optional(),
   JARVIS_API_TOKEN: z.string().optional(),
 });
@@ -49,7 +55,7 @@ export function resetEnvCache() {
   cached = undefined;
 }
 
-export type IntegrationName = "database" | "anthropic" | "stripe" | "hubspot" | "googleCalendar" | "email" | "jarvis";
+export type IntegrationName = "database" | "anthropic" | "stripe" | "hubspot" | "googleCalendar" | "zoom" | "email" | "jarvis";
 
 export type IntegrationStatus = {
   name: IntegrationName;
@@ -75,6 +81,7 @@ export function integrationStatuses(e: Env = env()): IntegrationStatus[] {
     s("stripe", !!(e.STRIPE_SECRET_KEY && e.STRIPE_WEBHOOK_SECRET), "Hosted checkout + signed webhooks"),
     s("hubspot", !!e.HUBSPOT_ACCESS_TOKEN, "CRM contacts and deals"),
     s("googleCalendar", !!(e.GOOGLE_CALENDAR_ID && e.GOOGLE_SERVICE_ACCOUNT_JSON), "Availability and appointments"),
+    s("zoom", !!(e.ZOOM_ACCOUNT_ID && e.ZOOM_CLIENT_ID && e.ZOOM_CLIENT_SECRET), "Video links for online sessions and events"),
     s("email", !!e.EMAIL_PROVIDER_API_KEY, "Transactional email"),
     s("jarvis", !!(e.JARVIS_BASE_URL && e.JARVIS_API_TOKEN), "Parent-system reporting (spec not yet supplied)"),
   ];

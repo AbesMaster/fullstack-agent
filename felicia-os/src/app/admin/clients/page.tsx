@@ -36,7 +36,7 @@ export default async function Page() {
                 const i = intakeFor.get(b.id);
                 return (
                   <tr key={b.id} className="border-t border-navy-900/5">
-                    <td className="p-2 whitespace-nowrap">{formatInZone(b.startsAt, "Europe/London")}</td><td className="p-2">{c.name}</td><td className="p-2">{s.name}</td><td className="p-2">{b.startsAt < new Date() && ["confirmed", "completed", "no_show"].includes(b.status) ? <AttendanceButtons kind="booking" id={b.id} status={b.status} /> : b.status}</td><td className="p-2">{formatMoney(b.amountMinor)}</td>
+                    <td className="p-2 whitespace-nowrap">{formatInZone(b.startsAt, "Europe/London")}</td><td className="p-2">{c.name}</td><td className="p-2">{s.name}<br /><span className="text-xs text-navy-800/60">{b.attendanceMode === "in_person" ? "In person" : b.videoJoinUrl ? "Online · Zoom link sent" : "Online"}</span></td><td className="p-2">{b.startsAt < new Date() && ["confirmed", "completed", "no_show"].includes(b.status) ? <AttendanceButtons kind="booking" id={b.id} status={b.status} /> : b.status}</td><td className="p-2">{formatMoney(b.amountMinor)}</td>
                     <td className="p-2">{i ? <>{i.requiresReview ? <span className="text-red-700">review needed</span> : "received"}{user.role === "owner" && <IntakeViewer id={i.id} />}</> : "—"}</td>
                   </tr>
                 );

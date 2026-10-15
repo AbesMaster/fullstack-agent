@@ -26,7 +26,7 @@ test("visitor books a complimentary discovery call", async ({ page }) => {
   await expect(slot).toBeVisible({ timeout: 20_000 });
   await slot.click();
   await page.getByLabel("Name").fill("E2E Visitor (test)");
-  await page.getByLabel("Email").fill("e2e-visitor@example.test");
+  await page.getByLabel("Email", { exact: true }).fill("e2e-visitor@example.test");
   await page.getByRole("checkbox", { name: /agree to the terms/ }).check();
   await page.getByRole("button", { name: "Confirm booking" }).click();
   await expect(page.getByText("You're booked")).toBeVisible();
@@ -38,7 +38,7 @@ test("visitor pays for a session through the (mock) hosted checkout", async ({ p
   await expect(slot).toBeVisible({ timeout: 20_000 });
   await slot.click();
   await page.getByLabel("Name").fill("E2E Payer (test)");
-  await page.getByLabel("Email").fill("e2e-payer@example.test");
+  await page.getByLabel("Email", { exact: true }).fill("e2e-payer@example.test");
   await page.getByRole("checkbox", { name: /agree to the terms/ }).check();
   await page.getByRole("button", { name: /Continue to secure payment/ }).click();
   await expect(page.getByText("Not a real payment")).toBeVisible();

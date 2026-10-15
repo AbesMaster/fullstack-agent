@@ -148,6 +148,8 @@ export const BookingRequestSchema = z.object({
   phone: z.string().trim().max(40).optional(),
   clientTimezone: z.string().refine(isValidTimeZone, "Invalid time zone"),
   participants: z.number().int().min(1).max(50).default(1),
+  /** Only used for hybrid services; online and in-person services decide it themselves. */
+  attendanceMode: z.enum(["online", "in_person"]).optional(),
   marketingConsent: z.boolean().default(false),
   acceptedTerms: z.literal(true, { errorMap: () => ({ message: "Please accept the terms and cancellation policy" }) }),
 });
@@ -198,6 +200,7 @@ export async function requestBooking(db: DB, input: z.input<typeof BookingReques
     endsAt: slot.end,
     clientTimezone: req.clientTimezone,
     participants: req.participants,
+    attendanceMode: service.deliveryMode === "hybrid" ? (req.attendanceMode ?? "online") : service.deliveryMode,
     status: free ? "confirmed" : "pending_payment",
     amountMinor,
     currency: service.currency,

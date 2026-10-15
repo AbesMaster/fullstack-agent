@@ -25,7 +25,7 @@ export default function Page() {
           <h2>AI assistance</h2>
           <p>We use AI tools to help run the business — for example, to answer routine website questions (the chat assistant always identifies itself as AI) and to draft content that a human reviews. Your health information is never shared with AI tools or our CRM.</p>
           <h2>Who we share data with</h2>
-          <p>Service providers acting on our behalf: hosting, email delivery, calendar and video calls, CRM ([CONFIRM: HubSpot]), payment processing and AI providers (Anthropic) for non-sensitive drafting. Some providers may process data outside the UK under appropriate safeguards [CONFIRM transfer mechanisms].</p>
+          <p>Service providers acting on our behalf: hosting, email delivery, calendar, video calls (Zoom, for online sessions: we share only the session time, never your name, email or health details; sessions are never recorded), CRM ([CONFIRM: HubSpot]), payment processing and AI providers (Anthropic) for non-sensitive drafting. Some providers may process data outside the UK under appropriate safeguards [CONFIRM transfer mechanisms].</p>
           <h2>How long we keep it</h2>
           <p>[CONFIRM retention schedule] — suggested: enquiries 24 months; client records 6 years (tax/accounting); welcome/consent forms 6 years or as advised by insurer; marketing until you unsubscribe.</p>
           <h2>Your rights</h2>

@@ -30,11 +30,27 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <Card title="Details">
             <EventEditor
               mode="edit"
-              initial={{ id: ev.id, title: ev.title, description: ev.description, location: ev.location, startsAt: toZonedInputValue(ev.startsAt), endsAt: toZonedInputValue(ev.endsAt), capacity: ev.capacity, priceMinor: ev.priceMinor, budgetMinor: ev.budgetMinor, includesBreathwork: ev.includesBreathwork, status: ev.status }}
+              initial={{ id: ev.id, title: ev.title, description: ev.description, location: ev.location, startsAt: toZonedInputValue(ev.startsAt), endsAt: toZonedInputValue(ev.endsAt), capacity: ev.capacity, priceMinor: ev.priceMinor, budgetMinor: ev.budgetMinor, includesBreathwork: ev.includesBreathwork, isOnline: ev.isOnline, status: ev.status }}
             />
           </Card>
         </div>
-        <Card title="Readiness checklist"><ChecklistEditor id={ev.id} items={ev.checklist} /></Card>
+        <div className="space-y-6">
+          <Card title="Readiness checklist"><ChecklistEditor id={ev.id} items={ev.checklist} /></Card>
+          {ev.isOnline && (
+            <Card title="Zoom">
+              {ev.videoJoinUrl ? (
+                <div className="space-y-2 text-sm">
+                  <p>Attendees receive this link in their confirmation and reminder emails:</p>
+                  <p className="break-all rounded-lg bg-ivory p-2 font-mono text-xs">{ev.videoJoinUrl}</p>
+                  {ev.videoPasscode && <p>Passcode: <span className="font-mono">{ev.videoPasscode}</span></p>}
+                  <p className="text-xs text-navy-800/60">Start the meeting from your own Zoom app. The waiting room is on and meetings are never recorded.</p>
+                </div>
+              ) : (
+                <p className="text-sm text-navy-800/70">The meeting is created automatically when the first person registers.</p>
+              )}
+            </Card>
+          )}
+        </div>
       </div>
       <Card title={`Registrations (${active.length} active)`}>
         {roster.length === 0 ? <p className="text-sm text-navy-800/60">Nobody has registered yet.</p> : (

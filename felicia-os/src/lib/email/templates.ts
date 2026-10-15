@@ -62,7 +62,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     kind: "transactional",
     requiredVars: ["name", "service", "when", "intakeUrl"],
     subject: () => "Preparing for your session",
-    body: (v) => `Dear ${v.name},\n\nYour ${v.service} is on ${v.when}. To help Felicia prepare, please complete your short welcome and consent form: ${v.intakeUrl}\n\nWear comfortable clothing, have water nearby, and allow a little quiet time afterwards.\n\nIf the session includes breathwork, the form asks a few health questions so we can keep you safe. Answers are encrypted and seen only by Felicia.${WELLBEING_NOTE}${SIGN_OFF}`,
+    body: (v) => `Dear ${v.name},\n\nYour ${v.service} is on ${v.when}.${v.joinInfo ? `\n\n${v.joinInfo}` : ""}\n\nTo help Felicia prepare, please complete your short welcome and consent form: ${v.intakeUrl}\n\nWear comfortable clothing, have water nearby, and allow a little quiet time afterwards.\n\nIf the session includes breathwork, the form asks a few health questions so we can keep you safe. Answers are encrypted and seen only by Felicia.${WELLBEING_NOTE}${SIGN_OFF}`,
   },
   post_session_thank_you: {
     kind: "transactional",
@@ -86,7 +86,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     kind: "transactional",
     requiredVars: ["name", "event", "when", "location"],
     subject: (v) => `You're registered: ${v.event}`,
-    body: (v) => `Dear ${v.name},\n\nYou're registered for ${v.event} on ${v.when} at ${v.location}.${v.healthNote ? `\n\n${v.healthNote}` : ""}${WELLBEING_NOTE}${SIGN_OFF}`,
+    body: (v) => `Dear ${v.name},\n\nYou're registered for ${v.event} on ${v.when} at ${v.location}.${v.joinInfo ? `\n\n${v.joinInfo}` : ""}${v.healthNote ? `\n\n${v.healthNote}` : ""}${WELLBEING_NOTE}${SIGN_OFF}`,
   },
   event_reminder: {
     kind: "transactional",
@@ -104,7 +104,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     kind: "transactional",
     requiredVars: ["name", "service", "when"],
     subject: () => "Your session has been rescheduled",
-    body: (v) => `Dear ${v.name},\n\nYour ${v.service} is now on ${v.when}.${SIGN_OFF}`,
+    body: (v) => `Dear ${v.name},\n\nYour ${v.service} is now on ${v.when}.${v.joinInfo ? `\n\n${v.joinInfo}` : ""}${SIGN_OFF}`,
   },
 };
 

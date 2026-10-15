@@ -8,12 +8,14 @@ Tick each item with a date and initials. Production deploys need **owner approva
 - [ ] Stripe account verified; test-mode run complete; live keys stored in the secret manager
 - [ ] HubSpot private app (least-privilege scopes); custom properties `felicia_source`, `felicia_marketing_consent`, `felicia_reference` created
 - [ ] Google service account with calendar shared to it
+- [ ] Zoom Server-to-Server OAuth app created on a Pro (or higher) licence; credentials stored
 - [ ] Resend domain verified (SPF, DKIM, DMARC)
 - [ ] Anthropic API key with a spend limit set
 - [ ] `SESSION_SECRET`, `DATA_ENCRYPTION_KEY` and `CRON_SECRET` generated, stored, and the encryption key backed up offline
 
 ## B. Verification in staging (real providers, test mode)
-- [ ] Discovery call booking → calendar event appears → confirmation email received
+- [ ] Discovery call booking → calendar event appears → Zoom meeting appears in Felicia's Zoom → confirmation email contains the join link
+- [ ] Rescheduling moves the Zoom meeting; cancelling deletes it
 - [ ] Paid booking → Stripe test card → webhook verified → booking confirmed → receipt + preparation emails
 - [ ] Replayed webhook does not double-record
 - [ ] Refund request → approval → Stripe test refund appears

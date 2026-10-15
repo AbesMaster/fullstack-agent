@@ -10,6 +10,7 @@ export const TOOLS = [
   "crm.write",
   "calendar.read",
   "calendar.write",
+  "video.manage",
   "payments.read",
   "payments.createCheckout",
   "payments.refund", // always approval-gated
@@ -137,8 +138,8 @@ export const AGENTS: AgentDefinition[] = [
   {
     id: "scheduling", number: 9, name: "Appointment & Scheduling", department: "Business Operations",
     mission: "Manage availability, bookings, reminders and time zones without double booking.",
-    responsibilities: ["Calendar availability", "Discovery calls", "Private appointments", "Reminders", "Rescheduling", "Time zones", "Prevent double bookings"],
-    tools: ["calendar.read", "calendar.write", "email.sendTransactional"], mayRequest: [], limits: L(),
+    responsibilities: ["Calendar availability", "Zoom links for online sessions", "Discovery calls", "Private appointments", "Reminders", "Rescheduling", "Time zones", "Prevent double bookings"],
+    tools: ["calendar.read", "calendar.write", "video.manage", "email.sendTransactional"], mayRequest: [], limits: L(),
     guardrails: ["Conflict check before every write"],
   },
   {
@@ -166,7 +167,7 @@ export const AGENTS: AgentDefinition[] = [
     id: "events", number: 13, name: "Retreat & Event Management", department: "Client Experiences",
     mission: "Plan and run workshops, retreats and Return to Wonder experiences.",
     responsibilities: ["Event workflows", "Registrations", "Capacity", "Budgets", "Suppliers", "Attendee payments", "Readiness checklists"],
-    tools: ["events.manage", "finance.read"], mayRequest: ["venue.book", "money.spend", "agreement.sign"], limits: L(),
+    tools: ["events.manage", "finance.read", "video.manage", "email.sendTransactional"], mayRequest: ["venue.book", "money.spend", "agreement.sign"], limits: L(),
     guardrails: ["Venue commitments and spending require approval"],
   },
   {
