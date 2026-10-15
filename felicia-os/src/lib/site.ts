@@ -25,12 +25,11 @@ export const NAV = [
 
 /** Assets the owner must supply before launch. Rendered as visible placeholders, never faked. */
 export const MISSING_ASSETS = [
-  "Logo (SVG + PNG) and favicon",
-  "Professional portrait photographs of Felicia",
+  "Logo (SVG + PNG). A gold star icon stands in as the favicon until the logo arrives",
+  "Full-resolution original portrait photograph (for print use)",
   "Location / nature photography for Return to Wonder",
   "Approved founder biography",
   "Verified credentials and training certificates (Star Magic, breathwork, any others)",
   "Testimonials with written client consent",
-  "Open Graph share image (1200×630)",
   "Final legal review of Privacy, Terms and Cancellation policies",
 ];

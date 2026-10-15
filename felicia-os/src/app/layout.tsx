@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     locale: "en_GB",
     title: `${SITE.name} — ${SITE.heroTitle}`,
     description: SITE.heroSub,
-    // images: ["/og.jpg"] — [MISSING ASSET] 1200×630 share image awaiting approval
+    // Share image: src/app/opengraph-image.jpg (picked up automatically by Next.js).
   },
   robots: process.env.APP_ENV === "production" ? { index: true, follow: true } : { index: false, follow: false },
 };

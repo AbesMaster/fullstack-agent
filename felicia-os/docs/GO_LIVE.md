@@ -16,10 +16,8 @@ Once Render is set up (step 3), in **Cloudflare → feliciastefanhealing.com →
 1. Add the records Render shows under **Settings → Custom Domains** for `feliciastefanhealing.com` and `www.feliciastefanhealing.com`: usually a `CNAME` for `@` and one for `www`, both pointing at the site's `….onrender.com` address. Cloudflare allows a CNAME on `@` (it "flattens" it automatically).
 2. Set both to **DNS only** (grey cloud), not Proxied, so Render can issue the site's security certificate. Wait until Render shows them as Verified.
 3. Add the email records Resend shows (for sending) the same way, also DNS only.
-4. **Receiving email:** Resend only sends. To get replies to `hello@feliciastefanhealing.com`, turn on **Cloudflare Email Routing** (free) and forward `hello@` to Felicia's own inbox.
-
-### The earlier domain, feliciastefan.com
-It was bought through Shopify and became the main address of the MetaMasterMindz merch store. In Shopify **Settings → Domains → Change primary domain**, set the store back to its previous address. Later you can either let feliciastefan.com expire, or (after its 60-day transfer lock, around 14 December 2026) point it at Felicia's site so both addresses work.
+4. Render redirects `www.feliciastefanhealing.com` to `feliciastefanhealing.com` automatically once both are added.
+5. **Receiving email:** Resend only sends. To get replies to `hello@feliciastefanhealing.com`, turn on **Cloudflare Email Routing** (free) and forward `hello@` to Felicia's own inbox.
 
 ## 2. Accounts (Felicia opens them, in her business's name)
 | Account | What it's for | Needed to launch? | Cost |

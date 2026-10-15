@@ -216,3 +216,16 @@ test("Return to Wonder: dates Felicia publishes appear on the page, and visitors
   await expect(visitor.getByRole("link", { name: "About Return to Wonder" })).toBeVisible();
   await visitor.close();
 });
+
+test("search engines get a sitemap, and a non-production site asks not to be indexed", async ({ request }) => {
+  const robots = await request.get("/robots.txt");
+  expect(robots.status()).toBe(200);
+  expect(await robots.text()).toContain("Disallow: /");
+  const sitemap = await request.get("/sitemap.xml");
+  expect(sitemap.status()).toBe(200);
+  const xml = await sitemap.text();
+  expect(xml).toContain("/return-to-wonder</loc>");
+  expect(xml).not.toContain("/admin");
+  expect((await request.get("/opengraph-image.jpg")).status()).toBe(200);
+  expect((await request.get("/icon.png")).status()).toBe(200);
+});

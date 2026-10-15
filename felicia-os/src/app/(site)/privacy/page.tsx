@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero, Section, Prose } from "@/components/ui";
 import { LegalDraftBanner } from "@/components/LegalDraftBanner";
+import { contactEmail } from "@/lib/config/env";
 
 export const metadata: Metadata = { title: "Privacy Policy" };
 
@@ -13,7 +14,7 @@ export default function Page() {
           <LegalDraftBanner />
           <p>This policy explains how MetaMasterMindz ("we"), the practice of Felicia Stefan, collects and uses personal data. We follow the UK GDPR and the Data Protection Act 2018.</p>
           <h2>Who we are</h2>
-          <p>Data controller: [CONFIRM legal name / trading name, registered address, ICO registration number]. Contact: [CONFIRM privacy email].</p>
+          <p>Data controller: [CONFIRM legal name / trading name, registered address, ICO registration number]. Contact: {contactEmail()}.</p>
           <h2>What we collect and why</h2>
           <ul>
             <li><strong>Enquiries and bookings</strong> — name, email, optional phone, time zone and your message. Lawful basis: steps prior to/performance of a contract.</li>

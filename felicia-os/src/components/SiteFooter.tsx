@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE } from "@/lib/site";
+import { contactEmail } from "@/lib/config/env";
 
 export function SiteFooter() {
   return (
@@ -31,6 +32,7 @@ export function SiteFooter() {
             <li><Link href="/terms">Terms & conditions</Link></li>
             <li><Link href="/cancellation-policy">Cancellation & refunds</Link></li>
             <li><Link href="/portal">Client portal</Link></li>
+            <li><a href={`mailto:${contactEmail()}`}>{contactEmail()}</a></li>
           </ul>
         </nav>
       </div>

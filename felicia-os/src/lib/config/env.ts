@@ -55,6 +55,11 @@ export function publicUrl(e: Env = env()) {
   return e.APP_URL.replace(/\/+$/, "");
 }
 
+/** The public contact address: the address part of EMAIL_FROM, e.g. hello@feliciastefanhealing.com. */
+export function contactEmail(e: Env = env()) {
+  return (e.EMAIL_FROM.match(/<([^>]+)>/)?.[1] ?? e.EMAIL_FROM).trim();
+}
+
 /** For tests only. */
 export function resetEnvCache() {
   cached = undefined;
