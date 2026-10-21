@@ -8,6 +8,7 @@ export const metadata = { title: "Felicia Command Center", robots: { index: fals
 
 const NAV = [
   ["/admin", "Overview"],
+  ["/admin/jarvis", "JARVIS"],
   ["/admin/approvals", "Approvals"],
   ["/admin/clients", "Enquiries & bookings"],
   ["/admin/events", "Events"],

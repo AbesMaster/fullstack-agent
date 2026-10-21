@@ -229,3 +229,18 @@ test("search engines get a sitemap, and a non-production site asks not to be ind
   expect((await request.get("/opengraph-image.jpg")).status()).toBe(200);
   expect((await request.get("/icon.png")).status()).toBe(200);
 });
+
+test("JARVIS mission control shows the six departments with live figures", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "JARVIS" }).click();
+  await expect(page.getByRole("heading", { name: "JARVIS" })).toBeVisible();
+  for (const d of ["executive", "acquisition", "operations", "experiences", "finance", "expansion"]) await expect(page.getByRole("button", { name: new RegExp(`% ${d}`) })).toBeVisible();
+  const api = await page.request.get("/api/admin/command");
+  expect(api.status()).toBe(200);
+  expect((await api.json()).streams).toHaveLength(6);
+  await page.screenshot({ path: "e2e-artifacts/jarvis.png" });
+});
+
+test("JARVIS data is only for signed-in staff", async ({ request }) => {
+  expect((await request.get("/api/admin/command")).status()).toBe(403);
+});
